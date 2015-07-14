@@ -30,8 +30,13 @@
         "!./node_modules/**/*.ts"
     ],
     "files": [
+        "./es6.d.ts",
         "./lib/json-schema.ts",
+        "./lib/omni.ts",
+        "./lib/schema-linter.ts",
         "./lib/schema-provider.ts",
+        "./lib/schema-selector-view.ts",
+        "./lib/schema-selector.ts",
         "./tsd.d.ts"
     ]
 }

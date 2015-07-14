@@ -1,5 +1,6 @@
 import _ = require('lodash');
 import {CompositeDisposable, ReplaySubject} from "rx";
+import {omni} from "./omni";
 
 class JsonSchema {
     private disposable = new CompositeDisposable();
@@ -7,38 +8,35 @@ class JsonSchema {
     public editor: Rx.Observable<Atom.TextEditor>;
 
     public activate(state) {
-        this.editor = this.setupEditorObservable();
+        omni.activate();
+        this.disposable.add(omni);
 
-        // Once a json editor is loaded init the schema provider
-        this.editor.where(z => !!z).take(1).subscribe(() => require('./schema-provider'));
+        var {schemaSelector} = require('./schema-selector');
+        this.disposable.add(schemaSelector);
+
+        schemaSelector.activate();
+        schemaSelector.attach();
     }
 
     public deactivate() {
         this.disposable.dispose();
     }
 
-    private setupEditorObservable() {
-        var subject = new ReplaySubject<Atom.TextEditor>(1);
-        this.disposable.add(subject);
-
-        this.disposable.add(atom.workspace.observeActivePaneItem((pane: any) => {
-            if (pane && pane.getGrammar) {
-                var grammar = pane.getGrammar();
-                if (grammar) {
-                    var grammarName = grammar.name;
-                    if (grammarName === 'JSON') {
-                        subject.onNext(pane);
-                        return;
-                    }
-                }
-            }
-
-            // This will tell us when the editor is no longer an appropriate editor
-            subject.onNext(null);
-        }));
-
-        return subject;
+    public consumeStatusBar(statusBar) {
+        var {schemaSelector} = require('./schema-selector');
+        schemaSelector.setup(statusBar);
     }
+    /*
+        public provideAutocomplete() {
+            var {CompletionProvider} = require("./features/lib/completion-provider");
+            this.disposable.add(CompletionProvider);
+            return CompletionProvider;
+        }*/
+
+        public provideLinter(linter) {
+            var LinterProvider = require("./schema-linter");
+            return LinterProvider.provider;
+        }
 }
 
 var instance = new JsonSchema;
