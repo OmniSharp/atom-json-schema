@@ -50,6 +50,10 @@ function getWordAt(str: string, pos: number) {
 
 function mapValues(editor: Atom.TextEditor, ranges: { [key: string]: ITokenRange }, error: validatorError): LinterError {
     var range = ranges[error.field];
+    if (!range) {
+        // TODO:  Should try and figure out some of these failures
+        return null;
+    }
     var line = range.section.start[0];
     var column = range.section.start[1];
     var text = editor.lineTextForBufferRow(line);
@@ -90,7 +94,7 @@ export var provider = [
 
                     var result = validate(data, { greedy: true });
                     if (validate.errors && validate.errors.length) {
-                        return validate.errors.map(error =>  mapValues(editor, ranges, error));
+                        return validate.errors.map(error => mapValues(editor, ranges, error)).filter(z => !!z);
                     }
 
                     return [];
