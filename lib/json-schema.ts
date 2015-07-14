@@ -14,6 +14,9 @@ class JsonSchema {
         var {schemaSelector} = require('./schema-selector');
         this.disposable.add(schemaSelector);
 
+        //var {schemaPrSelector} = require('./schema-selector');
+        //this.disposable.add(schemaSelector);
+
         schemaSelector.activate();
         schemaSelector.attach();
     }
@@ -26,17 +29,17 @@ class JsonSchema {
         var {schemaSelector} = require('./schema-selector');
         schemaSelector.setup(statusBar);
     }
-    /*
-        public provideAutocomplete() {
-            var {CompletionProvider} = require("./features/lib/completion-provider");
-            this.disposable.add(CompletionProvider);
-            return CompletionProvider;
-        }*/
 
-        public provideLinter(linter) {
-            var LinterProvider = require("./schema-linter");
-            return LinterProvider.provider;
-        }
+    public provideAutocomplete() {
+        var {CompletionProvider} = require("./schema-autocomplete");
+        //this.disposable.add(CompletionProvider);
+        return CompletionProvider;
+    }
+
+    public provideLinter(linter) {
+        var LinterProvider = require("./schema-linter");
+        return LinterProvider.provider;
+    }
 }
 
 var instance = new JsonSchema;

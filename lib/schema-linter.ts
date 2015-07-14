@@ -4,7 +4,7 @@ import _ = require('lodash');
 import {omni} from "./omni";
 import {Observable, CompositeDisposable} from "rx";
 import {schemaProvider} from "./schema-provider";
-
+import {getRanges, ITokenRange} from "./helpers/get-ranges";
 
 interface LinterError {
     type: string; // 'error' | 'warning'
@@ -48,115 +48,7 @@ function getWordAt(str: string, pos: number) {
     return wordLocation;
 }
 
-interface ITokenRange {
-    path: string;
-    section: { start: [number, number], end: [number, number] };
-    value: { start: [number, number], end: [number, number] }
-}
-
-function getRanges(editor: Atom.TextEditor) {
-    var doc = editor.getText();
-    let token_regex = /"([-a-zA-Z0-9+]+)"[\s]*:$/;
-    var open: string[] = [];
-    let depth = 1;
-    let line = 0;
-    let lineStart = 0;
-    var tokens = ['data'];
-    var start: [number, number][] = [];
-    var valueStart: [number, number][] = [];
-    var current = null;
-    var array = false;
-    var string = false;
-
-    var results: { [key: string] : ITokenRange } = {};
-
-
-    for (var index = doc.indexOf('{') + 1; index < doc.lastIndexOf('}'); index++) {
-        let char = doc[index];
-        if (char === '\n') {
-            line += 1;
-            if (doc[index + 1] === '\r') {
-                lineStart = index + 2;
-            } else {
-                lineStart = index + 1;
-            }
-        }
-
-        if (string && char !== '"' && doc[index - 1] !== "\\") {
-            continue;
-        }
-
-        if (!string && char === '"') {
-            string = true;
-        }
-
-        if (string && char === '"') {
-            string = false;
-        }
-
-        if (array && char !== ']') {
-            continue;
-        }
-
-        if (char === '[') {
-            array == true;
-        }
-
-        if (char === ']') {
-            array == false;
-        }
-
-        if (char === '{') {
-            depth += 1;
-            tokens.push(open[open.length - 1]);
-            start.push(start[start.length - 1]);
-            valueStart.push(valueStart[valueStart.length - 1]);
-        }
-
-        if (char === ':') {
-            let match = doc.substr(0, index + 1).match(token_regex);
-            open.push(match[1]);
-            start.push([line, index - match[0].length - lineStart]);
-            valueStart.push([line, index - lineStart + 1]);
-        }
-
-        if (open.length && (char === '}' || (!array && char === ','))) {
-            var path = tokens.concat([open.pop()]).join('.');
-            results[path] = {
-                path: path,
-                section: {
-                    start: start.pop(),
-                    end: [line, index + 1 - lineStart]
-                },
-                value: {
-                    start: valueStart.pop(),
-                    end: [line, index - lineStart]
-                }
-            };
-            open.pop();
-        }
-
-        if (char === '}') {
-            depth -= 1;
-            var path = tokens.join('.');
-            results[path] = {
-                path: path,
-                section: {
-                    start: start.pop(),
-                    end: [line, index - lineStart]
-                },
-                value: {
-                    start: valueStart.pop(),
-                    end: [line, index - 1 - lineStart]
-                }
-            };
-            tokens.pop();
-        }
-    }
-    return results;
-}
-
-function mapValues(editor: Atom.TextEditor, ranges: { [key: string] : ITokenRange }, error: validatorError): LinterError {
+function mapValues(editor: Atom.TextEditor, ranges: { [key: string]: ITokenRange }, error: validatorError): LinterError {
     var range = ranges[error.field];
     var line = range.section.start[0];
     var column = range.section.start[1];
@@ -169,7 +61,7 @@ function mapValues(editor: Atom.TextEditor, ranges: { [key: string] : ITokenRang
         filePath: editor.getPath(),
         line: line + 1,
         col: column + 1,
-        range: new Range(range.section.start, range.section.end)
+        range: new Range(range.value.start, range.value.end)
     };
 }
 
@@ -198,7 +90,7 @@ export var provider = [
 
                     var result = validate(data, { greedy: true });
                     if (validate.errors && validate.errors.length) {
-                        return validate.errors.map(error => mapValues(editor, ranges, error));
+                        return validate.errors.map(error =>  mapValues(editor, ranges, error));
                     }
 
                     return [];

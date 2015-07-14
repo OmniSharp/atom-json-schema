@@ -38,7 +38,10 @@ class Omni implements Rx.IDisposable {
 
     private _schema: ISchema;
     public get activeSchema() { return this._schema }
-    public set activeSchema(value) { this._schema = value }
+    public set activeSchema(value) {
+        this._schema = value;
+        this._editorObservable.take(1).where(z => !!z).subscribe(editor => editor['__json__schema__'] = value);
+    }
 }
 
 export var omni = new Omni;

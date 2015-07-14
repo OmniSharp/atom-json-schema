@@ -31,8 +31,10 @@
     ],
     "files": [
         "./es6.d.ts",
+        "./lib/helpers/get-ranges.ts",
         "./lib/json-schema.ts",
         "./lib/omni.ts",
+        "./lib/schema-autocomplete.ts",
         "./lib/schema-linter.ts",
         "./lib/schema-provider.ts",
         "./lib/schema-selector-view.ts",

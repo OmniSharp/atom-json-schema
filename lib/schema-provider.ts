@@ -23,7 +23,16 @@ export interface ISchema {
     description: string;
     fileMatch?: string[];
     url: string;
-    content: Rx.Observable<any>;
+    content: Rx.Observable<ISchemaInstance>;
+}
+
+export interface ISchemaInstance {
+    $ref: string;
+    enum: string[];
+    properties: ISchemaInstance[];
+    additionalProperties: ISchemaInstance;
+    definitions: { [key: string]: ISchemaInstance };
+    description: string;
 }
 
 class Schema implements ISchema {
@@ -39,10 +48,10 @@ class Schema implements ISchema {
         this.url = header.url;
     }
 
-    private _content: Rx.Observable<any>;
+    private _content: Rx.Observable<ISchemaInstance>;
     public get content() {
         if (!this._content)
-            this._content = Observable.fromPromise<any>(fetch(this.url).then(res => res.json<any>())).shareReplay(1);
+            this._content = Observable.fromPromise<ISchemaInstance>(fetch(this.url).then(res => res.json<ISchemaInstance>())).shareReplay(1);
         return this._content;
     }
 }
@@ -57,7 +66,7 @@ class SchemaProvider {
             description: 'none',
             fileMatch: [],
             url: 'none',
-            content: Observable.just<any>({})
+            content: Observable.just<ISchemaInstance>(<any>{})
         });
     }
 
@@ -100,7 +109,8 @@ class SchemaProvider {
         var fileName = editor.getBuffer().getBaseName();
         return this.schemas
             .flatMap(schemas => Observable.from(schemas))
-            .firstOrDefault(schema => _.any(schema.fileMatch, match => fileName === match), <any>{ content: {} });
+            .firstOrDefault(schema => _.any(schema.fileMatch, match => fileName === match), <any>{ content: {} })
+            .tapOnNext(schema => editor['__json__schema__'] = schema);
     }
 }
 
