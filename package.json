@@ -3,7 +3,7 @@
   "main": "./lib/json-schema",
   "version": "0.1.0",
   "description": "Json Schema enhancements for Atom",
-  "repository": "",
+  "repository": "https://github.com/OmniSharp/atom-json-schema",
   "license": "MIT",
   "engines": {
     "atom": ">=0.174.0 <2.0.0"
@@ -39,7 +39,7 @@
     },
     "jsonschema.provider": {
       "versions": {
-        "1.0.0": "consumeProvider"
+        "0.1.0": "consumeProvider"
       }
     }
   },
