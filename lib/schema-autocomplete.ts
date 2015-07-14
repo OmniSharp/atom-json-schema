@@ -88,7 +88,7 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
     var existingKeys = _(getRanges(options.editor)).keys()
         .filter(z => _.startsWith(z.split('.').slice(1).join('.') + '.', context.path))
         .map(z => z.replace('data.' + context.path, ''))
-        .filter(z => z.indexOf('.') === -1)
+        .filter(z => z && z.indexOf('.') === -1)
         .value();
 
     var p = schemaProvider
@@ -102,7 +102,7 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
 
             if (schema.properties && _.any(schema.properties)) {
                 return _.keys(schema.properties)
-                    .filter(z => _.contains(existingKeys, z))
+                    .filter(z => !_.contains(existingKeys, z))
                     .map(property => ({ key: property, type: 'property', description: schema.properties[property].description }));
             }
 
