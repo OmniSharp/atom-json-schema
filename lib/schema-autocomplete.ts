@@ -14,31 +14,23 @@ interface RequestOptions {
     activatedManually: boolean;
 }
 
-interface Suggestion {
-    //Either text or snippet is required
-    text?: string;
-    snippet?: string;
-    displayText?: string;
-    replacementPrefix?: string;
-    type: string;
-    leftLabel?: string;
-    leftLabelHTML?: string;
-    rightLabel?: string;
-    rightLabelHTML?: string;
-    iconHTML?: string;
-    description?: string;
-    descriptionMoreURL?: string;
-    className?: string;
+function fixSnippet(snippet: string, options: { hasTrailingQuote: boolean; hasLeadingQuote: boolean }) {
+    if (!options.hasLeadingQuote)
+        snippet = '"' + snippet;
+    if (!options.hasTrailingQuote)
+        snippet = snippet + '"';
+
+    return snippet;
 }
 
-function makeSuggestion(item: { key: string; description: string; type: string }) {
+function makeSuggestion(item: { key: string; description: string; type: string }, options: { hasTrailingQuote: boolean; hasLeadingQuote: boolean }) {
     var description = item.description,
         leftLabel = item.type.substr(0, 1),
         type = 'variable';
 
     return {
         _search: item.key,
-        snippet: `"${item.key}"`,
+        snippet: fixSnippet(item.key, options),
         type: type,
         displayText: item.key,
         className: 'autocomplete-json-schema',
@@ -83,8 +75,34 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
     if (!/[A-Z_0-9.]+/i.test(lastCharacterTyped)) {
         return;
     }*/
+    var line = options.editor.getBuffer().getLines()[options.bufferPosition.row];
+    var hasLeadingQuote = false;
+    for (var i = options.bufferPosition.column; i >= 0; i--) {
+        let char = line[i];
+        if (char === ',' || char === '}' || char === ':') {
+            break;
+        }
 
-    var context = getPath(options.editor, (line, column) => options.bufferPosition.row === line && options.bufferPosition.column == column);
+        if (char === '"') {
+            hasLeadingQuote = true;
+            break;
+        }
+    }
+    var hasTrailingQuote = false;
+    for (var i = options.bufferPosition.column; i < line.length; i++) {
+        let char = line[i];
+        if (char === ':' || char === '}' || char === ',' || char === '{') {
+            break;
+        }
+
+        if (char === '"') {
+            hasTrailingQuote = true;
+            break;
+        }
+    }
+
+    var context = getPath(options.editor, (line, column) =>
+        options.bufferPosition.row === line && options.bufferPosition.column === column + 1);
     var existingKeys = _(getRanges(options.editor)).keys()
         .filter(z => _.startsWith(z.split('.').slice(1).join('.') + '.', context.path))
         .map(z => z.replace('data.' + context.path, ''))
@@ -118,8 +136,24 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
         p = p.then(s =>
             filter(s, search, { key: 'key' }));
 
-    return p.then(response => response.map(s => makeSuggestion(s)))
+    var baseSuggestions = p.then(response => response.map(s => makeSuggestion(s, { hasLeadingQuote, hasTrailingQuote })));
+
+    if (providers.length) {
+        var workingOptions = <IAutocompleteProviderOptions>_.extend({}, context, options);
+        var workingProviders = _.filter(providers, z =>
+            _.contains(z.fileMatchs, options.editor.getBuffer().getBaseName()) && z.pathMatch(context.path))
+            .map(z => z.getSuggestions(workingOptions).then(suggestions =>
+                _.each(suggestions, s => s.snippet = fixSnippet(s.snippet, { hasLeadingQuote, hasTrailingQuote }))));
+        if (workingProviders.length) {
+            return Promise.all(workingProviders.concat([baseSuggestions]))
+                .then(items =>
+                    _.flatten(items));
+        }
+    }
+    return baseSuggestions;
 }
+
+var providers: IAutocompleteProvider[] = [].concat(require('./providers/npm-provider'));
 
 export var CompletionProvider = {
     selector: '.source.json',
@@ -127,6 +161,10 @@ export var CompletionProvider = {
     inclusionPriority: 3,
     excludeLowerPriority: false,
     getSuggestions,
+    registerProvider: (provider) => {
+        providers.push(provider);
+    },
+    dispose() { }
     //getSuggestions: _.throttle(getSuggestions, 0),
     //onDidInsertSuggestion,
     //dispose

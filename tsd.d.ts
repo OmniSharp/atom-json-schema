@@ -20,3 +20,39 @@
 /// <reference path="typingsTemp/text-buffer/text-buffer.d.ts" />
 /// <reference path="node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="es6.d.ts" />
+
+interface IAutocompleteProviderOptions {
+    editor: Atom.TextEditor;
+    bufferPosition: TextBuffer.Point; // the position of the cursor
+    prefix: string;
+    scopeDescriptor: { scopes: string[] };
+    activatedManually: boolean;
+    path: string;
+    isKey: boolean;
+    isValue: boolean;
+}
+
+interface IAutocompleteProvider {
+    fileMatchs: string[];
+    pathMatch: (path: string) => boolean;
+    getSuggestions: (options: IAutocompleteProviderOptions) => Rx.IPromise<Suggestion[]>;
+    dispose(): void;
+}
+
+
+interface Suggestion {
+    //Either text or snippet is required
+    text?: string;
+    snippet?: string;
+    displayText?: string;
+    replacementPrefix?: string;
+    type: string;
+    leftLabel?: string;
+    leftLabelHTML?: string;
+    rightLabel?: string;
+    rightLabelHTML?: string;
+    iconHTML?: string;
+    description?: string;
+    descriptionMoreURL?: string;
+    className?: string;
+}

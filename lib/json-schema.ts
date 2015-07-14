@@ -30,6 +30,15 @@ class JsonSchema {
         schemaSelector.setup(statusBar);
     }
 
+    public consumeProvider(providers) {
+        if (!providers) return;
+        if (!_.isArray(providers)) providers = [providers];
+        var cd = new CompositeDisposable();
+        var {CompletionProvider} = require("./schema-autocomplete");
+        _.each(providers, CompletionProvider.registerProvider);
+        return cd;
+    }
+
     public provideAutocomplete() {
         var {CompletionProvider} = require("./schema-autocomplete");
         //this.disposable.add(CompletionProvider);
