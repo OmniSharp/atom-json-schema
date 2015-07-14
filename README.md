@@ -66,3 +66,9 @@ Then in your `package.json` add...
   }
 }
 ```
+
+
+# TODO
+* Bower support?
+* JSPM support?
+* Allow for custom $schema's
