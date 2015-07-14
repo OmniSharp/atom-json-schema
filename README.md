@@ -2,6 +2,11 @@
 
 Adds support for [JSON Schema](http://json-schema.org/) in [Atom](http://atom.io).
 
+![](https://raw.githubusercontent.com/OmniSharp/atom-json-schema/master/schema.gif)
+
+
+![](https://raw.githubusercontent.com/OmniSharp/atom-json-schema/master/schema2.gif)
+
 ## Whats it do
 Using is-my-json-valid for schema validation, Json Schema warns the user if their json file doesn't match the commonly defined schema.  Also using the defined Json Schema we can offer auto completion results for enum values.
 
