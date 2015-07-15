@@ -29,10 +29,12 @@ export interface ISchema {
 export interface ISchemaInstance {
     $ref: string;
     enum: string[];
-    properties: ISchemaInstance[];
+    properties: { [key: string]: ISchemaInstance };
+    default: string;
     additionalProperties: ISchemaInstance;
     definitions: { [key: string]: ISchemaInstance };
     description: string;
+    type: string | string[];
 }
 
 class Schema implements ISchema {

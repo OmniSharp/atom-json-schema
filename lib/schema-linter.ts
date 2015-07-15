@@ -49,7 +49,7 @@ function getWordAt(str: string, pos: number) {
 }
 
 function mapValues(editor: Atom.TextEditor, ranges: { [key: string]: ITokenRange }, error: validatorError): LinterError {
-    var range = ranges[error.field];
+    var range = ranges[error.field.replace('data.', '')];
     if (!range) {
         // TODO:  Should try and figure out some of these failures
         return null;
@@ -83,7 +83,7 @@ export var provider = [
                 .flatMap(schema => schema.content)
                 .map(schema => makeValidator(schema))
                 .map(validate => {
-                    var ranges = getRanges(editor);
+                    var {ranges} = getRanges(editor);
                     try {
                         var text = editor.getText().replace(/\n/g, '').replace(/\r/g, '').replace(/\t/g, '').trim();
                         var data = JSON.parse(text);
