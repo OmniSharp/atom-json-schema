@@ -42,6 +42,7 @@ function makeSuggestion(item: { key: string; description: string; type: string }
 
     return {
         _search: item.key,
+        text: item.key,
         snippet: fixSnippet(item.key, options, item.type),
         type: type,
         displayText: item.key,

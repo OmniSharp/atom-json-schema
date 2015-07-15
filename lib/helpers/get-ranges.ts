@@ -8,7 +8,7 @@ export interface ITokenRange {
 
 function doGetRanges(editor: Atom.TextEditor, predicate: any): any {
     var doc = editor.getText();
-    let token_regex = /"([-a-zA-Z0-9+\.]+)"[\s]*:$/;
+    let token_regex = /"([-a-zA-Z0-9+\._]+)"[\s]*:$/;
     var open: string[] = [];
     let depth = 1;
     let line = 0;

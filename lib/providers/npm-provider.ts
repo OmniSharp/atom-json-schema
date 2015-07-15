@@ -22,7 +22,8 @@ function search(text) {
         fetch(`https://skimdb.npmjs.com/registry/_design/app/_view/browseAll?group_level=1&limit=100&start_key=%5B%22${encodeURIComponent(text) }%22,%7B%7D%5D&end_key=%5B%22${encodeURIComponent(text) }z%22,%7B%7D%5D`)
             .then(res => res.json<NpmResult>())
         )
-        .flatMap(z => Observable.from(z.rows));
+        .flatMap(z =>
+            Observable.from(z.rows));
 }
 
 //http://registry.npmjs.org/gulp/latest
@@ -38,6 +39,7 @@ function makeSuggestion(item: { key: string }) {
 
     return {
         _search: item.key,
+        text: item.key,
         snippet: item.key,
         type: type,
         displayText: item.key,
@@ -47,6 +49,7 @@ function makeSuggestion(item: { key: string }) {
 
 var packageName: IAutocompleteProvider = {
     getSuggestions(options: IAutocompleteProviderOptions) {
+        if (!options.prefix) return Promise.resolve([]);
         return <any>search(options.prefix)
             .map(makeSuggestion)
             .toArray()
