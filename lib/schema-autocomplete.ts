@@ -153,7 +153,7 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
     return baseSuggestions;
 }
 
-var providers: IAutocompleteProvider[] = [].concat(require('./providers/npm-provider'));
+var providers: IAutocompleteProvider[] = [].concat(require('./providers/npm-provider')).concat(require('./providers/bower-provider'));
 
 export var CompletionProvider = {
     selector: '.source.json',
