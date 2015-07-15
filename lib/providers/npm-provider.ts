@@ -62,7 +62,7 @@ var packageName: IAutocompleteProvider = {
 
 var packageVersion: IAutocompleteProvider = {
     getSuggestions(options: IAutocompleteProviderOptions) {
-        var name = options.path.split('.');
+        var name = options.path.split('/');
         return <any>searchPackage(options.prefix, name[name.length - 1])
             .map(z => ({ key: `^${z.version}` }))
             .map(makeSuggestion)

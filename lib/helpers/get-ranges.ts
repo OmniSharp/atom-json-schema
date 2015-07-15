@@ -37,7 +37,7 @@ function doGetRanges(editor: Atom.TextEditor, predicate: any): any {
 
         if (predicate && predicate(line, index - lineStart)) {
             return <any>{
-                path: open.join('.'),
+                path: open.join('/'),
             };
         }
 
@@ -80,7 +80,12 @@ function doGetRanges(editor: Atom.TextEditor, predicate: any): any {
         }
 
         if (open.length && (char === '}' || (!isArray && char === ','))) {
+<<<<<<< HEAD
             var path = tokens.concat([open.pop()]).join('.');
+=======
+            isValue = false;
+            var path = tokens.concat([open.pop()]).join('/');
+>>>>>>> Use slash for main path (to avoid some potential issues with '.', there may be more)
             if (results) {
                 results[path] = {
                     path: path,
@@ -99,7 +104,7 @@ function doGetRanges(editor: Atom.TextEditor, predicate: any): any {
 
         if (char === '}') {
             depth -= 1;
-            var path = tokens.join('.');
+            var path = tokens.join('/');
             if (results) {
                 results[path] = {
                     path: path,

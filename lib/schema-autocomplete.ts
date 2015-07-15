@@ -48,7 +48,7 @@ function renderReturnType(returnType: string) {
 
 function schemaGet(schema: ISchemaInstance, path: string) {
     // ignore .data
-    var p = path.split('.');
+    var p = path.split('/');
     var rootSchema = schema;
     while (p.length) {
         let s = p.shift();
@@ -104,9 +104,9 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
     var context = getPath(options.editor, (line, column) =>
         options.bufferPosition.row === line && options.bufferPosition.column === column + 1);
     var existingKeys = _(getRanges(options.editor)).keys()
-        .filter(z => _.startsWith(z.split('.').slice(1).join('.') + '.', context.path))
+        .filter(z => _.startsWith(z.split('/').slice(1).join('/') + '/', context.path))
         .map(z => z.replace('data.' + context.path, ''))
-        .filter(z => z && z.indexOf('.') === -1)
+        .filter(z => z && z.indexOf('/') === -1)
         .value();
 
     var p = schemaProvider
