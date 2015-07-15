@@ -14,7 +14,7 @@ interface RequestOptions {
     activatedManually: boolean;
 }
 
-function fixSnippet(snippet: string, options: { hasTrailingQuote: boolean; hasLeadingQuote: boolean; type: string }) {
+function fixSnippet(snippet: string, options: { hasTrailingQuote: boolean; hasLeadingQuote: boolean; }, type: string) {
     let t = _.trim(snippet);
     if (_.startsWith(t, '{') || _.startsWith(t, '"') || _.endsWith(t, '}') || _.endsWith(t, '"') || _.endsWith(t, ','))
         return snippet;
@@ -24,8 +24,12 @@ function fixSnippet(snippet: string, options: { hasTrailingQuote: boolean; hasLe
     if (!options.hasTrailingQuote)
         snippet = snippet + '"';
 
-    if (options.type === "string") {
-
+    if (type === "string") {
+        snippet = snippet += ': ""'
+    } else if (type === "object") {
+        snippet = snippet += ': {}'
+    } else if (type === "array") {
+        snippet = snippet += ': []'
     }
 
     return snippet;
@@ -38,7 +42,7 @@ function makeSuggestion(item: { key: string; description: string; type: string }
 
     return {
         _search: item.key,
-        snippet: fixSnippet(item.key, options),
+        snippet: fixSnippet(item.key, options, item.type),
         type: type,
         displayText: item.key,
         className: 'autocomplete-json-schema',
@@ -155,16 +159,16 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
             }
 
             if (schema.enum && schema.enum.length) {
-                return schema.enum.map(property => ({ key: property, type: 'enum', description: undefined }));
+                return schema.enum.map(property => ({ key: property, type: 'enum', description: '' }));
             }
 
             if (inferedType === "object" && schema.properties && _.any(schema.properties)) {
                 return _.keys(schema.properties)
                     .filter(z => !_.contains(existingKeys, z))
                     .map(property => {
-var propertySchema = schema.properties[property];
- return { key: property, type: propertySchema.type, description: propertySchema.description }
-}));
+                        var propertySchema = schema.properties[property];
+                        return { key: property, type: typeof propertySchema.type === "string" ? <string> propertySchema.type : 'property', description: propertySchema.description }
+                    });
             }
 
             var types: string[] = [];
@@ -208,7 +212,7 @@ var propertySchema = schema.properties[property];
         var workingProviders = _.filter(providers, z =>
             _.contains(z.fileMatchs, options.editor.getBuffer().getBaseName()) && z.pathMatch(context.path))
             .map(z => z.getSuggestions(workingOptions).then(suggestions =>
-                _.each(suggestions, s => s.snippet = fixSnippet(s.snippet, { hasLeadingQuote, hasTrailingQuote }))));
+                _.each(suggestions, s => s.snippet = fixSnippet(s.snippet, { hasLeadingQuote, hasTrailingQuote }, 'other'))));
         if (workingProviders.length) {
             return Promise.all(workingProviders.concat([baseSuggestions]))
                 .then(items =>
