@@ -114,7 +114,7 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
         .flatMap(schema => schema.content)
         .map(schema => schemaGet(schema, context.path))
         .map(schema => {
-            if (context.isValue && schema.enum && schema.enum.length) {
+            if (schema.enum && schema.enum.length) {
                 return schema.enum.map(property => ({ key: property, type: 'enum', description: undefined }));
             }
 
@@ -157,7 +157,6 @@ var providers: IAutocompleteProvider[] = [].concat(require('./providers/npm-prov
 
 export var CompletionProvider = {
     selector: '.source.json',
-    //disableForSelector: 'source.json .comment',
     inclusionPriority: 3,
     excludeLowerPriority: false,
     getSuggestions,
@@ -165,7 +164,4 @@ export var CompletionProvider = {
         providers.push(provider);
     },
     dispose() { }
-    //getSuggestions: _.throttle(getSuggestions, 0),
-    //onDidInsertSuggestion,
-    //dispose
 }

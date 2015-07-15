@@ -47,8 +47,6 @@ function makeSuggestion(item: { key: string }) {
 
 var packageName: IAutocompleteProvider = {
     getSuggestions(options: IAutocompleteProviderOptions) {
-        if (options.isValue) return Promise.resolve([]);
-
         return <any>search(options.prefix)
             .map(makeSuggestion)
             .toArray()
@@ -64,8 +62,6 @@ var packageName: IAutocompleteProvider = {
 
 var packageVersion: IAutocompleteProvider = {
     getSuggestions(options: IAutocompleteProviderOptions) {
-        if (options.isKey) return Promise.resolve([]);
-
         var name = options.path.split('.');
         return <any>searchPackage(options.prefix, name[name.length - 1])
             .map(z => ({ key: `^${z.version}` }))
