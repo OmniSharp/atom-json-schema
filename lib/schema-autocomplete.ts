@@ -166,7 +166,7 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
                 types = <any>schema.type;
             }
 
-            if (types.length) {
+            if (types.length > 1) {
                 return _.map(types, type => {
                     if (type === "string") {
                         return { key: '""', type: "value", description: '' };
