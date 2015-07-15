@@ -36,6 +36,13 @@ function doGetRanges(editor: Atom.TextEditor, predicate: any): any {
             }
         }
 
+        if (predicate && predicate(line, index - lineStart)) {
+            if (char === '}' || char === ',') open.pop();
+            return <any>{
+                path: open.join('/'),
+            };
+        }
+
         if (isString && char !== '"' && doc[index - 1] !== "\\") {
             continue;
         }
@@ -115,12 +122,6 @@ function doGetRanges(editor: Atom.TextEditor, predicate: any): any {
                 };
                 tokens.pop();
             }
-        }
-
-        if (predicate && predicate(line, index - lineStart)) {
-            return <any>{
-                path: open.join('/'),
-            };
         }
     }
     return { ranges: results, objectPaths };

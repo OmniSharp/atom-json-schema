@@ -14,14 +14,19 @@ interface RequestOptions {
     activatedManually: boolean;
 }
 
-function fixSnippet(snippet: string, options: { hasTrailingQuote: boolean; hasLeadingQuote: boolean }) {
-    if (_.startsWith(_.trim(snippet), '{') || _.startsWith(_.trim(snippet), '"'))
+function fixSnippet(snippet: string, options: { hasTrailingQuote: boolean; hasLeadingQuote: boolean; type: string }) {
+    let t = _.trim(snippet);
+    if (_.startsWith(t, '{') || _.startsWith(t, '"') || _.endsWith(t, '}') || _.endsWith(t, '"') || _.endsWith(t, ','))
         return snippet;
 
     if (!options.hasLeadingQuote)
         snippet = '"' + snippet;
     if (!options.hasTrailingQuote)
         snippet = snippet + '"';
+
+    if (options.type === "string") {
+
+    }
 
     return snippet;
 }
@@ -156,7 +161,10 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
             if (inferedType === "object" && schema.properties && _.any(schema.properties)) {
                 return _.keys(schema.properties)
                     .filter(z => !_.contains(existingKeys, z))
-                    .map(property => ({ key: property, type: 'property', description: schema.properties[property].description }));
+                    .map(property => {
+var propertySchema = schema.properties[property];
+ return { key: property, type: propertySchema.type, description: propertySchema.description }
+}));
             }
 
             var types: string[] = [];

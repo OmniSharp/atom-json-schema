@@ -53,7 +53,9 @@ var packageName: IAutocompleteProvider = {
             .toPromise();
     },
     fileMatchs: ['package.json'],
-    pathMatch(path) { return path === "dependencies" },
+    pathMatch(path) {
+        return path === "dependencies" || path === "devDependencies";
+    },
     dispose() { }
     //getSuggestions: _.throttle(getSuggestions, 0),
     //onDidInsertSuggestion,
@@ -70,7 +72,9 @@ var packageVersion: IAutocompleteProvider = {
             .toPromise();
     },
     fileMatchs: ['package.json'],
-    pathMatch(path) { return _.startsWith(path, "dependencies.") },
+    pathMatch(path) {
+        return _.startsWith(path, "dependencies/") || _.startsWith(path, "devDependencies/");
+    },
     dispose() { }
     //getSuggestions: _.throttle(getSuggestions, 0),
     //onDidInsertSuggestion,
