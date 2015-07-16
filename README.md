@@ -39,8 +39,6 @@ interface IAutocompleteProviderOptions {
     scopeDescriptor: { scopes: string[] };
     activatedManually: boolean;
     path: string;
-    isKey: boolean;
-    isValue: boolean;
 }
 ```
 
@@ -52,10 +50,6 @@ interface IAutocompleteProviderOptions {
   identical to autocomplete+ with a few extra options.
   * path
     is the path part of the file such as `dependencies` or `dependencies.lodash`
-  * isKey
-    The user is in the key side of the json.  This is used to determine what the path means.
-  * isValue
-    The user is in the value side of the json.  This is used to determine what the path means.
 
 Then in your `package.json` add...
 

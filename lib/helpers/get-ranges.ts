@@ -8,21 +8,21 @@ export interface ITokenRange {
 
 function doGetRanges(editor: Atom.TextEditor, predicate: any): any {
     var doc = editor.getText();
-    let token_regex = /"([-a-zA-Z0-9+\.]+)"[\s]*:$/;
+    let token_regex = /"([-a-zA-Z0-9+\._]+)"[\s]*:$/;
     var open: string[] = [];
     let depth = 1;
     let line = 0;
     let lineStart = 0;
-    var tokens = ['data'];
+    var tokens = [];
     var start: [number, number][] = [];
     var valueStart: [number, number][] = [];
     var current = null;
     var isArray = false;
     var isString = false;
-    var isValue = false;
 
     if (!predicate) {
-        var results: { [key: string]: ITokenRange } = {};
+        var objectPaths: { [key: string]: { line: number; column: number; } } = {};
+        var results: { [key: string]: ITokenRange; } = {};
     }
 
     for (var index = doc.indexOf('{') + 1; index < doc.lastIndexOf('}'); index++) {
@@ -37,10 +37,9 @@ function doGetRanges(editor: Atom.TextEditor, predicate: any): any {
         }
 
         if (predicate && predicate(line, index - lineStart)) {
+            if (char === '}' || char === ',') open.pop();
             return <any>{
-                path: open.join('.'),
-                isKey: !(isValue || isString || isArray),
-                isValue: isValue || isString || isArray
+                path: open.join('/'),
             };
         }
 
@@ -70,6 +69,12 @@ function doGetRanges(editor: Atom.TextEditor, predicate: any): any {
             depth += 1;
             tokens.push(open[open.length - 1]);
             start.push(start[start.length - 1]);
+            if (objectPaths) {
+                objectPaths[tokens.join('/')] = {
+                    line: line,
+                    column: index - lineStart,
+                };
+            }
             valueStart.push(valueStart[valueStart.length - 1]);
         }
 
@@ -79,13 +84,11 @@ function doGetRanges(editor: Atom.TextEditor, predicate: any): any {
                 open.push(match[1]);
                 start.push([line, index - match[0].length - lineStart]);
                 valueStart.push([line, index - lineStart + 1]);
-                isValue = true;
             }
         }
 
         if (open.length && (char === '}' || (!isArray && char === ','))) {
-            isValue = false;
-            var path = tokens.concat([open.pop()]).join('.');
+            var path = tokens.concat([open.pop()]).join('/');
             if (results) {
                 results[path] = {
                     path: path,
@@ -104,7 +107,7 @@ function doGetRanges(editor: Atom.TextEditor, predicate: any): any {
 
         if (char === '}') {
             depth -= 1;
-            var path = tokens.join('.');
+            var path = tokens.join('/');
             if (results) {
                 results[path] = {
                     path: path,
@@ -120,15 +123,14 @@ function doGetRanges(editor: Atom.TextEditor, predicate: any): any {
                 tokens.pop();
             }
         }
-
     }
-    return results;
+    return { ranges: results, objectPaths };
 }
 
-export function getRanges(editor: Atom.TextEditor): { [key: string]: ITokenRange } {
+export function getRanges(editor: Atom.TextEditor): { ranges: { [key: string]: ITokenRange }; objectPaths: { [key: string]: { line: number; column: number; } }; } {
     return doGetRanges(editor, undefined);
 }
 
-export function getPath(editor: Atom.TextEditor, predicate: (line: number, column: number) => boolean): { path: string; isKey: boolean; isValue: boolean } {
+export function getPath(editor: Atom.TextEditor, predicate: (line: number, column: number) => boolean): { path: string; } {
     return doGetRanges(editor, predicate);
 }

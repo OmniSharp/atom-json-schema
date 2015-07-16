@@ -28,8 +28,6 @@ interface IAutocompleteProviderOptions {
     scopeDescriptor: { scopes: string[] };
     activatedManually: boolean;
     path: string;
-    isKey: boolean;
-    isValue: boolean;
 }
 
 interface IAutocompleteProvider {
