@@ -58,7 +58,6 @@ function makeSuggestion(item: { name }) {
 
 var packageName: IAutocompleteProvider = {
     getSuggestions(options: IAutocompleteProviderOptions) {
-        if (options.isKey && options.prefix) return Promise.resolve([]);
         return search(options.prefix)
             .filter(r=> _.contains(r.name, options.prefix))
             .map(makeSuggestion)
@@ -72,8 +71,7 @@ var packageName: IAutocompleteProvider = {
 
 var packageVersion: IAutocompleteProvider = {
     getSuggestions(options: IAutocompleteProviderOptions) {
-        if (options.isKey) return Promise.resolve([]);
-        var name = options.path.split('.');
+        var name = options.path.split('/');
         return searchPackage(options.prefix, name[name.length - 1])
             .map(tag => ({ name: `^${tag}` }))
             .map(makeSuggestion)
@@ -81,7 +79,7 @@ var packageVersion: IAutocompleteProvider = {
             .toPromise();
     },
     fileMatchs: ['bower.json'],
-    pathMatch(path) { return _.startsWith(path, "dependencies."); },
+    pathMatch(path) { return _.startsWith(path, "dependencies/"); },
     dispose() { }
 }
 
