@@ -114,7 +114,14 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
         }
     }
 
-    options.prefix = _.trim(options.prefix, ':{}" ');
+    var prefix = options.prefix;
+    try {
+        let cursor = options.editor.getLastCursor();
+        let editor = options.editor;
+        prefix = <any> editor.getTextInBufferRange(cursor.getCurrentWordBufferRange({ wordRegex: /^[\t ]*$|[^\s\/\\\(\)"':,\;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?\-]+|[\/\\\(\)"':,\;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?\-]+/ }));
+    } catch (e) { }
+
+    prefix = _.trim(prefix, ':{}" ');
 
     var context = getPath(options.editor, (line, column) =>
         options.bufferPosition.row === line && options.bufferPosition.column === column + 1);
@@ -198,9 +205,11 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
         })
         .toPromise();
 
-    var search = options.prefix;
+    var search = prefix;
     if (search === ".")
         search = "";
+
+    options.prefix = prefix;
 
     if (search)
         p = p.then(s =>
@@ -209,7 +218,7 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
     var baseSuggestions = p.then(response => response.map(s => makeSuggestion(s, { hasLeadingQuote, hasTrailingQuote })));
 
     if (providers.length) {
-        var workingOptions = <IAutocompleteProviderOptions>_.extend({}, context, options);
+        var workingOptions = <IAutocompleteProviderOptions>_.assign({ prefix }, context, options);
         var workingProviders = _.filter(providers, z =>
             _.contains(z.fileMatchs, options.editor.getBuffer().getBaseName()) && z.pathMatch(context.path))
             .map(z => z.getSuggestions(workingOptions).then(suggestions =>
@@ -223,7 +232,7 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
     return baseSuggestions;
 }
 
-var providers: IAutocompleteProvider[] = [].concat(require('./providers/npm-provider'));
+var providers: IAutocompleteProvider[] = [].concat(require('./providers/npm-provider')).concat(require('./providers/bower-provider'));
 
 export var CompletionProvider = {
     selector: '.source.json',
