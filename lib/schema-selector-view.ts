@@ -5,6 +5,7 @@ import _ = require('lodash');
 import React = require('react');
 import {omni} from "./omni";
 import {schemaProvider, ISchema} from "./schema-provider";
+import $ = require('jquery');
 
 interface SelectorState {
     schemas?: ISchema[];
