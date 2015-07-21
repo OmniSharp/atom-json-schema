@@ -28,6 +28,7 @@ interface IAutocompleteProviderOptions {
     scopeDescriptor: { scopes: string[] };
     activatedManually: boolean;
     path: string;
+    replacementPrefix: string;
 }
 
 interface IAutocompleteProvider {

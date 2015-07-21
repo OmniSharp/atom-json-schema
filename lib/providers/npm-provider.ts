@@ -49,8 +49,8 @@ function makeSuggestion(item: { key: string }) {
 
 var packageName: IAutocompleteProvider = {
     getSuggestions(options: IAutocompleteProviderOptions) {
-        if (!options.prefix) return Promise.resolve([]);
-        return <any>search(options.prefix)
+        if (!options.replacementPrefix) return Promise.resolve([]);
+        return <any>search(options.replacementPrefix)
             .map(makeSuggestion)
             .toArray()
             .toPromise();
@@ -68,7 +68,7 @@ var packageName: IAutocompleteProvider = {
 var packageVersion: IAutocompleteProvider = {
     getSuggestions(options: IAutocompleteProviderOptions) {
         var name = options.path.split('/');
-        return <any>searchPackage(options.prefix, name[name.length - 1])
+        return <any>searchPackage(options.replacementPrefix, name[name.length - 1])
             .map(z => ({ key: `^${z.version}` }))
             .map(makeSuggestion)
             .toArray()

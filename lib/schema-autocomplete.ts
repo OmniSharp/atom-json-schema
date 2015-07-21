@@ -21,7 +21,7 @@ function fixSnippet(snippet: string, options: { hasTrailingQuote: boolean; hasLe
 
     if (!options.hasLeadingQuote)
         snippet = '"' + snippet;
-    if (!options.hasTrailingQuote)
+    if (!options.hasTrailingQuote && !_.endsWith(snippet, '.'))
         snippet = snippet + '"';
 
     if (type === "string") {
@@ -35,7 +35,7 @@ function fixSnippet(snippet: string, options: { hasTrailingQuote: boolean; hasLe
     return snippet;
 }
 
-function makeSuggestion(item: { key: string; description: string; type: string }, options: { hasTrailingQuote: boolean; hasLeadingQuote: boolean }) {
+function makeSuggestion(item: { key: string; description: string; type: string }, options: { replacementPrefix: string; hasTrailingQuote: boolean; hasLeadingQuote: boolean }) {
     var description = item.description,
         leftLabel = item.type.substr(0, 1),
         type = 'variable';
@@ -209,16 +209,16 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
     if (search === ".")
         search = "";
 
-    options.prefix = prefix;
+    //options.prefix = prefix;
 
     if (search)
         p = p.then(s =>
             filter(s, search, { key: 'key' }));
 
-    var baseSuggestions = p.then(response => response.map(s => makeSuggestion(s, { hasLeadingQuote, hasTrailingQuote })));
+    var baseSuggestions = p.then(response => response.map(s => makeSuggestion(s, { replacementPrefix: prefix, hasLeadingQuote, hasTrailingQuote })));
 
     if (providers.length) {
-        var workingOptions = <IAutocompleteProviderOptions>_.assign({ prefix }, context, options);
+        var workingOptions = <IAutocompleteProviderOptions>_.assign({ prefix, replacementPrefix: prefix }, context, options);
         var workingProviders = _.filter(providers, z =>
             _.contains(z.fileMatchs, options.editor.getBuffer().getBaseName()) && z.pathMatch(context.path))
             .map(z => z.getSuggestions(workingOptions).then(suggestions =>
@@ -241,6 +241,11 @@ export var CompletionProvider = {
     getSuggestions,
     registerProvider: (provider) => {
         providers.push(provider);
+    },
+    onDidInsertSuggestion({editor, suggestion}: { editor: Atom.TextEditor; triggerPosition: any; suggestion: { text: string } }) {
+        if (_.endsWith(suggestion.text, '.')) {
+            _.defer(() => atom.commands.dispatch(atom.views.getView(editor), "autocomplete-plus:activate"))
+        }
     },
     dispose() { }
 }

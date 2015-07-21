@@ -58,8 +58,8 @@ function makeSuggestion(item: { name }) {
 
 var packageName: IAutocompleteProvider = {
     getSuggestions(options: IAutocompleteProviderOptions) {
-        return search(options.prefix)
-            .filter(r=> _.contains(r.name, options.prefix))
+        return search(options.replacementPrefix)
+            .filter(r=> _.contains(r.name, options.replacementPrefix))
             .map(makeSuggestion)
             .toArray()
             .toPromise();
@@ -72,7 +72,7 @@ var packageName: IAutocompleteProvider = {
 var packageVersion: IAutocompleteProvider = {
     getSuggestions(options: IAutocompleteProviderOptions) {
         var name = options.path.split('/');
-        return searchPackage(options.prefix, name[name.length - 1])
+        return searchPackage(options.replacementPrefix, name[name.length - 1])
             .map(tag => ({ name: `^${tag}` }))
             .map(makeSuggestion)
             .toArray()
