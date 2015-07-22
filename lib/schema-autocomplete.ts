@@ -162,7 +162,7 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
             }
 
             var objectPath = _.find(objectPaths, (value, key) => key === context.path);
-            if (objectPath && _.isArray(schema.type) && _.contains(schema.type, "object") && (options.bufferPosition.row == objectPath.line && options.bufferPosition.column > objectPath.column || options.bufferPosition.row > objectPath.line)) {
+            if (objectPath && _.isArray(schema.type) && _.contains(schema.type, "object") && (options.bufferPosition.row == objectPath.line && options.bufferPosition.column + 1 > objectPath.column || options.bufferPosition.row > objectPath.line)) {
                 inferedType = "object";
             }
 
