@@ -118,10 +118,10 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
     try {
         let cursor = options.editor.getLastCursor();
         let editor = options.editor;
-        prefix = <any> editor.getTextInBufferRange(cursor.getCurrentWordBufferRange({ wordRegex: /^[\t ]*$|[^\s\/\\\(\)"':,\;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?\-]+|[\/\\\(\)"':,\;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?\-]+/ }));
+        prefix = <any> editor.getTextInBufferRange(cursor.getCurrentWordBufferRange({ wordRegex: /^[\t ]*$|[^\s\/\\\(\)"':,\;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?]+|[\/\\\(\)"':,\;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?]+/ }));
     } catch (e) { }
 
-    prefix = _.trim(prefix, ':{}" ');
+    prefix = _.trim(prefix, ':{}," ');
 
     var context = getPath(options.editor, (line, column) =>
         options.bufferPosition.row === line && options.bufferPosition.column === column + 1);
@@ -218,7 +218,7 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
     var baseSuggestions = p.then(response => response.map(s => makeSuggestion(s, { replacementPrefix: prefix, hasLeadingQuote, hasTrailingQuote })));
 
     if (providers.length) {
-        var workingOptions = <IAutocompleteProviderOptions>_.assign({ prefix, replacementPrefix: prefix }, context, options);
+        var workingOptions = <IAutocompleteProviderOptions>_.defaults({ prefix, replacementPrefix: prefix }, context, options);
         var workingProviders = _.filter(providers, z =>
             _.contains(z.fileMatchs, options.editor.getBuffer().getBaseName()) && z.pathMatch(context.path))
             .map(z => z.getSuggestions(workingOptions).then(suggestions =>

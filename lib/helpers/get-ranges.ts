@@ -36,6 +36,13 @@ function doGetRanges(editor: Atom.TextEditor, predicate: any): any {
             }
         }
 
+        if ((isString || isArray) && predicate && predicate(line, index - lineStart)) {
+            if (char === '}' || char === ',') open.pop();
+            return <any>{
+                path: open.join('/'),
+            };
+        }
+
         if (isString && char !== '"' && doc[index - 1] !== "\\") {
             continue;
         }
