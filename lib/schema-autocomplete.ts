@@ -61,7 +61,7 @@ function renderReturnType(returnType: string) {
 
 function schemaGet(schema: ISchemaInstance, path: string) {
     // ignore .data
-    var p = path.split('/');
+    var p = (path  || '').split('/');
     var rootSchema = schema;
     while (p.length) {
         let s = p.shift();
@@ -137,7 +137,7 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
         .flatMap(schema => schema.content)
         .map(schema => {
             // ignore .data
-            var p = context.path.split('/');
+            var p = (context.path || '').split('/');
             var rootSchema = schema;
 
             var parentSchema;
