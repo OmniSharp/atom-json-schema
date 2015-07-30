@@ -1,7 +1,7 @@
 {
   "name": "json-schema",
   "main": "./lib/json-schema",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Json Schema enhancements for Atom",
   "repository": "https://github.com/OmniSharp/atom-json-schema",
   "license": "MIT",
