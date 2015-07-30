@@ -37,6 +37,7 @@ export class SelectorComponent extends React.Component<{ alignLeft: boolean }, S
         return React.DOM.a({
             href: '#',
             onClick: (e) => {
+                if (e.target !== e.currentTarget) return;
                 var view = new FrameworkSelectorSelectListView(atom.workspace.getActiveTextEditor(), {
                     attachTo: '.framework-selector',
                     alignLeft: this.props.alignLeft,
