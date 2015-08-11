@@ -10,8 +10,10 @@ interface LinterError {
     type: string; // 'error' | 'warning'
     text?: string;
     html?: string;
-    filePath?: string,
-    range?: Range
+    filePath?: string;
+    range?: Range;
+    line?: number;
+    col?: number;
 }
 
 interface validatorResult {
@@ -70,7 +72,11 @@ function mapValues(editor: Atom.TextEditor, ranges: { [key: string]: ITokenRange
 }
 
 
-var makeValidator = _.memoize(schema => validator(schema));
+var makeValidator = _.memoize(schema => {
+    if (_.isEmpty(schema))
+        return null;
+    return validator(schema);
+});
 
 export var provider = [
     {
@@ -99,6 +105,7 @@ export var provider = [
 
                     return [];
                 })
+                .defaultIfEmpty([])
                 .toPromise()
     }
 ];

@@ -106,13 +106,20 @@ class SchemaProvider {
     public getSchemaForEditor(editor: Atom.TextEditor) {
         if (!editor) return Observable.just<ISchema>(<any>{ content: {} });
 
-        if (editor['__json__schema__']) return Observable.just<ISchema>(editor['__json__schema__']);
+        if (_.has(editor, '__json__schema__')) {
+            if (editor['__json__schema__']) {
+                return Observable.just<ISchema>(editor['__json__schema__']);
+            } else {
+                return Observable.empty<ISchema>();
+            }
+        }
 
         var fileName = editor.getBuffer().getBaseName();
         return this.schemas
             .flatMap(schemas => Observable.from(schemas))
-            .firstOrDefault(schema => _.any(schema.fileMatch, match => fileName === match), <any>{ content: {} })
-            .tapOnNext(schema => editor['__json__schema__'] = schema);
+            .firstOrDefault(schema => _.any(schema.fileMatch, match => fileName === match), null)
+            .tapOnNext(schema => editor['__json__schema__'] = schema)
+            .where(z => !!z);
     }
 }
 

@@ -3,6 +3,7 @@ import {SelectorComponent} from './schema-selector-view';
 import React = require('react');
 import {omni} from "./omni";
 import {schemaProvider, ISchema} from "./schema-provider";
+import {isEmpty} from "lodash";
 
 class SchemaSelector {
     private disposable: Rx.CompositeDisposable;
@@ -64,7 +65,7 @@ class SchemaSelector {
 
         this.disposable.add(omni.activeEditor
             .flatMapLatest(editor => schemaProvider.getSchemaForEditor(editor))
-            .where(z => !!z)
+            .defaultIfEmpty(<any>{})
             .subscribe(activeSchema => {
                 omni.activeSchema = activeSchema;
                 this._component.setState({ activeSchema });

@@ -148,6 +148,8 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
                     schema = schema.properties[s]
                 } else if (schema.additionalProperties) {
                     schema = schema.additionalProperties;
+                } else {
+                    schema = <any>{};
                 }
                 if (schema.$ref) {
                     // This is the most common def case, may not always work
@@ -183,7 +185,7 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
             if (typeof schema.type === "string") {
                 types = <any>[schema.type];
             } else if (_.isArray(types)) {
-                types = <any>schema.type;
+                types = <any>schema.type || [];
             }
 
             if (types.length > 1) {
@@ -203,6 +205,7 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
 
             return [];
         })
+        .defaultIfEmpty([])
         .toPromise();
 
     var search = prefix;
@@ -236,7 +239,7 @@ var providers: IAutocompleteProvider[] = [].concat(require('./providers/npm-prov
 
 export var CompletionProvider = {
     selector: '.source.json',
-    inclusionPriority: 3,
+    inclusionPriority: 2,
     excludeLowerPriority: false,
     getSuggestions,
     registerProvider: (provider) => {
