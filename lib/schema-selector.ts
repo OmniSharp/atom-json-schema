@@ -33,7 +33,7 @@ class SchemaSelector {
     private _attach() {
         this.view = document.createElement("span");
         this.view.classList.add('inline-block');
-        this.view.classList.add('framework-selector');
+        this.view.classList.add('schema-selector');
         this.view.style.display = 'none';
         var alignLeft = !atom.config.get<boolean>('grammar-selector.showOnRightSideOfStatusBar');
         if (!alignLeft) {
