@@ -1,4 +1,13 @@
-var validator: (schema) => validatorResult = require('is-my-json-valid');
+var validator: (schema) => validatorResult;
+(function(){
+    var loophole = require("loophole");
+    function allowUnsafe(fn) {
+        return loophole.allowUnsafeEval(function () { return loophole.allowUnsafeNewFunction(function () { return fn(); }); });
+    }
+
+    allowUnsafe(() => validator = require('is-my-json-valid'));
+})();
+
 var Range = require('atom').Range;
 import _ = require('lodash');
 import {omni} from "./omni";
