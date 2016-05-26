@@ -6,7 +6,7 @@
 
 import json from 'vs/base/common/json';
 import Modes from 'vs/editor/common/modes';
-import jsonTokenTypes from 'vs/languages/json/common/features/jsonTokenTypes';
+import jsonTokenTypes from '../features/jsonTokenTypes';
 
 export function createTokenizationSupport(mode:Modes.IMode, supportComments:boolean):Modes.ITokenizationSupport {
 	return {

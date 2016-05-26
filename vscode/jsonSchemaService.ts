@@ -12,7 +12,7 @@ import {IJSONSchema, IJSONSchemaMap} from 'vs/base/common/jsonSchema';
 import Strings from 'vs/base/common/strings';
 import URI from './common/uri';
 import Types from 'vs/base/common/types';
-import Parser from 'vs/languages/json/common/parser/jsonParser';
+import Parser from './parser/jsonParser';
 import {IResourceService, ResourceEvents, IResourceChangedEvent} from 'vs/editor/common/services/resourceService';
 import {IRequestService} from 'vs/platform/request/common/request';
 import {IWorkspaceContextService} from 'vs/platform/workspace/common/workspace';

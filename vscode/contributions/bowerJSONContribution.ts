@@ -7,10 +7,10 @@
 import HtmlContent from 'vs/base/common/htmlContent';
 import Strings from 'vs/base/common/strings';
 import nls from 'vs/nls';
-import JSONWorker from 'vs/languages/json/common/jsonWorker';
+import JSONWorker from '../jsonWorker';
 import {IRequestService} from 'vs/platform/request/common/request';
 import URI from '../common/uri';
-import {JSONLocation} from 'vs/languages/json/common/parser/jsonLocation';
+import {JSONLocation} from '../parser/jsonLocation';
 
 export class BowerJSONContribution implements JSONWorker.IJSONWorkerContribution {
 

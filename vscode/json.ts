@@ -8,8 +8,8 @@
 import modes from 'vs/editor/common/modes';
 import URI from 'vs/base/common/uri';
 import Platform from 'vs/platform/platform';
-import jsonWorker from 'vs/languages/json/common/jsonWorker';
-import tokenization from 'vs/languages/json/common/features/tokenization';
+import jsonWorker from '../jsonWorker';
+import tokenization from '../features/tokenization';
 import {AbstractMode, createWordRegExp, ModeWorkerManager} from 'vs/editor/common/modes/abstractMode';
 import {OneWorkerAttr, AllWorkersAttr} from 'vs/platform/thread/common/threadService';
 import {IThreadService, ThreadAffinity} from 'vs/platform/thread/common/thread';
@@ -34,7 +34,7 @@ export class JSONMode extends AbstractMode {
 		@IThreadService threadService: IThreadService
 	) {
 		super(descriptor.id);
-		this._modeWorkerManager = new ModeWorkerManager<jsonWorker.JSONWorker>(descriptor, 'vs/languages/json/common/jsonWorker', 'JSONWorker', null, instantiationService);
+		this._modeWorkerManager = new ModeWorkerManager<jsonWorker.JSONWorker>(descriptor, '../jsonWorker', 'JSONWorker', null, instantiationService);
 		this._threadService = threadService;
 
 		this.tokenizationSupport = tokenization.createTokenizationSupport(this, true);

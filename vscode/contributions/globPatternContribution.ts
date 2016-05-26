@@ -8,9 +8,9 @@ import HtmlContent from 'vs/base/common/htmlContent';
 import Strings from 'vs/base/common/strings';
 import Modes from 'vs/editor/common/modes';
 import nls from 'vs/nls';
-import JSONWorker from 'vs/languages/json/common/jsonWorker';
+import JSONWorker from '../jsonWorker';
 import URI from '../common/uri';
-import {JSONLocation} from 'vs/languages/json/common/parser/jsonLocation';
+import {JSONLocation} from '../parser/jsonLocation';
 
 var globProperties:Modes.ISuggestion[] = [
 	{ type: 'value', label: nls.localize('fileLabel', "Files by Extension"), codeSnippet: '"**/*.{{extension}}": true', documentationLabel: nls.localize('fileDescription', "Match all files of a specific file extension.")},

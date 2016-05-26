@@ -14,7 +14,7 @@ ModesRegistry.registerCompatMode({
     extensions: ['.json', '.bowerrc', '.jshintrc', '.jscsrc', '.eslintrc', '.babelrc'],
     aliases: ['JSON', 'json'],
     mimetypes: ['application/json'],
-    moduleId: 'vs/languages/json/common/json',
+    moduleId: '../json',
     ctorName: 'JSONMode'
 });
 
