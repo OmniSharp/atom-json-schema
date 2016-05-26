@@ -6,29 +6,18 @@
 
 import URI from './common/uri';
 import Severity from './common/severity';
-import EditorCommon = require('vs/editor/common/editorCommon');
-import Modes = require('vs/editor/common/modes');
-import HtmlContent = require('./common/htmlContent');
-import Parser = require('./parser/jsonParser');
-import JSONFormatter = require('./common/jsonFormatter');
-import SchemaService = require('./jsonSchemaService');
-import JSONSchema = require('./common/jsonSchema');
-import JSONIntellisense = require('./jsonIntellisense');
-import Strings = require('./common/strings');
-import ProjectJSONContribution = require('./contributions/projectJSONContribution');
-import PackageJSONContribution = require('./contributions/packageJSONContribution');
-import BowerJSONContribution = require('./contributions/bowerJSONContribution');
-import GlobPatternContribution = require('./contributions/globPatternContribution');
-import errors = require('./common/errors');
-import {IMarkerService, IMarkerData} from 'vs/platform/markers/common/markers';
-import {IRequestService} from 'vs/platform/request/common/request';
-import {IWorkspaceContextService} from 'vs/platform/workspace/common/workspace';
-import {ISchemaContributions} from 'vs/platform/jsonschemas/common/jsonContributionRegistry';
-import {IResourceService} from 'vs/editor/common/services/resourceService';
-import {IInstantiationService} from 'vs/platform/instantiation/common/instantiation';
+import HtmlContent from './common/htmlContent';
+import Parser from './parser/jsonParser';
+import JSONFormatter from './common/jsonFormatter';
+import SchemaService from './jsonSchemaService';
+import JSONSchema from './common/jsonSchema';
+import JSONIntellisense from './jsonIntellisense';
+import Strings from './common/strings';
+import ProjectJSONContribution from './contributions/projectJSONContribution';
+import PackageJSONContribution from './contributions/packageJSONContribution';
+import BowerJSONContribution from './contributions/bowerJSONContribution';
+import GlobPatternContribution from './contributions/globPatternContribution';
 import {JSONLocation} from './parser/jsonLocation';
-import {filterSuggestions} from 'vs/editor/common/modes/supports/suggestSupport';
-import {ValidationHelper} from 'vs/editor/common/worker/validationHelper';
 
 export interface IOptionsSchema {
     /**
@@ -55,7 +44,7 @@ export interface IOptions {
 }
 
 export interface ISuggestionsCollector {
-    add(suggestion: Modes.ISuggestion): void;
+    add(suggestion: Suggestion): void;
     setAsIncomplete() : void;
     error(message:string): void;
 }
@@ -109,10 +98,10 @@ export class JSONWorker {
             instantiationService.createInstance(GlobPatternContribution.GlobPatternContribution)
         ];
 
-        this.jsonIntellisense = new JSONIntellisense.JSONIntellisense(this.schemaService, this.requestService, this.contributions);
+        this.jsonIntellisense = new JSONIntellisense.JSONIntellisense(this.schemaService, this.contributions);
     }
 
-    public navigateValueSet(resource:URI, range:EditorCommon.IRange, up:boolean):Promise<Modes.IInplaceReplaceSupportResult> {
+    public navigateValueSet(resource:URI, range:EditorCommon.IRange, up:boolean):Promise<IInplaceReplaceSupportResult> {
         var modelMirror = this.resourceService.get(resource);
         var offset = modelMirror.getOffsetFromPosition({ lineNumber: range.startLineNumber, column: range.startColumn });
 
@@ -125,18 +114,18 @@ export class JSONWorker {
         if (node && (node.type === 'string' || node.type === 'number' || node.type === 'boolean' || node.type === 'null')) {
             return this.schemaService.getSchemaForResource(resource.toString(), doc).then((schema) => {
                 if (schema) {
-                    var proposals : Modes.ISuggestion[] = [];
+                    var proposals : Suggestion[] = [];
                     var proposed: any = {};
                     var collector = {
-                        add: (suggestion: Modes.ISuggestion) => {
-                            if (!proposed[suggestion.label]) {
-                                proposed[suggestion.label] = true;
+                        add: (suggestion: Suggestion) => {
+                            if (!proposed[suggestion.text]) {
+                                proposed[suggestion.text] = true;
                                 proposals.push(suggestion);
                             }
                         },
                         setAsIncomplete: () => { /* ignore */ },
                         error: (message: string) => {
-                            errors.onUnexpectedError(message);
+                            throw new Error(message);
                         }
                     };
 
@@ -145,7 +134,7 @@ export class JSONWorker {
                     var range = modelMirror.getRangeFromOffsetAndLength(node.start, node.end - node.start);
                     var text = modelMirror.getValueInRange(range);
                     for (var i = 0, len = proposals.length; i < len; i++) {
-                        if (Strings.equalsIgnoreCase(proposals[i].label, text)) {
+                        if (Strings.equalsIgnoreCase(proposals[i].text, text)) {
                             var nextIdx = i;
                             if (up) {
                                 nextIdx = (i + 1) % len;
@@ -156,7 +145,7 @@ export class JSONWorker {
                                 }
                             }
                             return {
-                                value: proposals[nextIdx].label,
+                                value: proposals[nextIdx].text,
                                 range: range
                             };
                         }
@@ -264,17 +253,17 @@ export class JSONWorker {
 
     }
 
-    public provideCompletionItems(resource:URI, position:EditorCommon.IPosition):Promise<Modes.ISuggestResult[]> {
+    public provideCompletionItems(resource:URI, position:EditorCommon.IPosition):Promise<Suggestion[]> {
         return this.doSuggest(resource, position).then(value => filterSuggestions(value));
     }
 
-    private doSuggest(resource:URI, position:EditorCommon.IPosition):Promise<Modes.ISuggestResult> {
+    private doSuggest(resource:URI, position:EditorCommon.IPosition):Promise<Suggestion> {
         var modelMirror = this.resourceService.get(resource);
 
         return this.jsonIntellisense.doSuggest(resource, modelMirror, position);
     }
 
-    public provideHover(resource:URI, position:EditorCommon.IPosition): Promise<Modes.Hover> {
+    public provideHover(resource:URI, position:EditorCommon.IPosition): Promise<Hover> {
 
         var modelMirror = this.resourceService.get(resource);
 
@@ -332,10 +321,10 @@ export class JSONWorker {
         });
     }
 
-    private createInfoResult(htmlContent : HtmlContent.IHTMLContentElement[], node: Parser.ASTNode, modelMirror: EditorCommon.IMirrorModel) : Modes.Hover {
+    private createInfoResult(htmlContent : HtmlContent.IHTMLContentElement[], node: Parser.ASTNode, modelMirror: EditorCommon.IMirrorModel) : Hover {
         var range = modelMirror.getRangeFromOffsetAndLength(node.start, node.end - node.start);
 
-        var result:Modes.Hover = {
+        var result:Hover = {
             htmlContent: htmlContent,
             range: range
         };
@@ -343,7 +332,7 @@ export class JSONWorker {
     }
 
 
-    public provideDocumentSymbols(resource:URI):Promise<Modes.SymbolInformation[]> {
+    public provideDocumentSymbols(resource:URI):Promise<SymbolInformation[]> {
         var modelMirror = this.resourceService.get(resource);
 
         var parser = new Parser.JSONParser();
@@ -357,7 +346,7 @@ export class JSONWorker {
         var resourceString = resource.toString();
         if ((resourceString === 'vscode://defaultsettings/keybindings.json') || Strings.endsWith(resourceString.toLowerCase(), '/user/keybindings.json')) {
             if (root.type === 'array') {
-                var result : Modes.SymbolInformation[] = [];
+                var result : SymbolInformation[] = [];
                 (<Parser.ArrayASTNode> root).items.forEach((item) => {
                     if (item.type === 'object') {
                         var property = (<Parser.ObjectASTNode> item).getFirstProperty('key');
@@ -365,7 +354,7 @@ export class JSONWorker {
                             var range = modelMirror.getRangeFromOffsetAndLength(item.start, item.end - item.start);
                             result.push({
                                 name: property.value.getValue(),
-                                kind: Modes.SymbolKind.String,
+                                kind: "string",
                                 location: {
                                     uri: resource,
                                     range: range
@@ -378,7 +367,7 @@ export class JSONWorker {
             }
         }
 
-        function collectOutlineEntries(result: Modes.SymbolInformation[], node: Parser.ASTNode, containerName: string): Modes.SymbolInformation[] {
+        function collectOutlineEntries(result: SymbolInformation[], node: Parser.ASTNode, containerName: string): SymbolInformation[] {
             if (node.type === 'array') {
                 (<Parser.ArrayASTNode>node).items.forEach((node:Parser.ASTNode) => {
                     collectOutlineEntries(result, node, containerName);
@@ -410,7 +399,7 @@ export class JSONWorker {
         return Promise.resolve(result);
     }
 
-    public format(resource: URI, range: EditorCommon.IRange, options: Modes.IFormattingOptions): Promise<EditorCommon.ISingleEditOperation[]> {
+    public format(resource: URI, range: EditorCommon.IRange, options: IFormattingOptions): Promise<EditorCommon.ISingleEditOperation[]> {
         let model = this.resourceService.get(resource);
         let formatRange = range ? model.getOffsetAndLengthFromRange(range) : void 0;
         let edits = JSONFormatter.format(model.getValue(), formatRange, { insertSpaces: options.insertSpaces, tabSize: options.tabSize, eol: model.getEOL() });
@@ -419,19 +408,50 @@ export class JSONWorker {
     }
 }
 
-function getSymbolKind(nodeType: string): Modes.SymbolKind {
+function getSymbolKind(nodeType: string) {
     switch (nodeType) {
         case 'object':
-            return Modes.SymbolKind.Module;
         case 'string':
-            return Modes.SymbolKind.String;
         case 'number':
-            return Modes.SymbolKind.Number;
         case 'array':
-            return Modes.SymbolKind.Array;
         case 'boolean':
-            return Modes.SymbolKind.Boolean;
+            return nodeType;
         default: // 'null'
-            return Modes.SymbolKind.Variable;
+            return "variable";
     }
+}
+
+export interface SymbolInformation {
+    name: string;
+    containerName?: string;
+    kind: string;
+    location: Location;
+}
+
+export interface IFormattingOptions {
+    tabSize:number;
+    insertSpaces:boolean;
+}
+
+export class Location {
+    uri: URI;
+    range: [number, number];
+}
+
+/**
+ * A hover represents additional information for a symbol or word. Hovers are
+ * rendered in a tooltip-like widget.
+ */
+export interface Hover {
+    /**
+     * The contents of this hover.
+     */
+    htmlContent: HtmlContent.IHTMLContentElement[];
+
+    /**
+     * The range to which this hover applies. When missing, the
+     * editor will use the range at the current position or the
+     * current position itself.
+     */
+    range: [number, number];
 }

@@ -16,7 +16,7 @@ import Parser from './parser/jsonParser';
 //import {IRequestService} from 'vs/platform/request/common/request';
 //import {IWorkspaceContextService} from 'vs/platform/workspace/common/workspace';
 //import {ISchemaContributions} from 'vs/platform/jsonschemas/common/jsonContributionRegistry';
-import {IDisposable, dispose} from './common/lifecycle';
+import {IDisposable, CompositeDisposable} from '../disposables';
 
 export interface IJSONSchemaService {
 
@@ -211,17 +211,17 @@ export class JSONSchemaService implements IJSONSchemaService {
 
     private requestService: IRequestService;
     private contextService : IWorkspaceContextService;
-    private callOnDispose:IDisposable[];
+    private callOnDispose:CompositeDisposable;
 
     constructor(@IRequestService requestService: IRequestService,
         @IWorkspaceContextService contextService?: IWorkspaceContextService,
         @IResourceService resourceService?: IResourceService) {
         this.requestService = requestService;
         this.contextService = contextService;
-        this.callOnDispose = [];
+        this.callOnDispose = new CompositeDisposable;
 
         if (resourceService) {
-            this.callOnDispose.push(resourceService.addListener2_(ResourceEvents.CHANGED, (e: IResourceChangedEvent) => this.onResourceChange(e)));
+            this.callOnDispose.add(resourceService.addListener2_(ResourceEvents.CHANGED, (e: IResourceChangedEvent) => this.onResourceChange(e)));
         }
 
         this.contributionSchemas = {};
@@ -232,7 +232,7 @@ export class JSONSchemaService implements IJSONSchemaService {
     }
 
     public dispose(): void {
-        this.callOnDispose = dispose(this.callOnDispose);
+        this.callOnDispose.dispose();
     }
 
     private onResourceChange(e: IResourceChangedEvent): void {

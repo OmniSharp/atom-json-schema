@@ -10,23 +10,18 @@ import SchemaService from './jsonSchemaService';
 import _ from 'lodash';
 import JsonWorker from './jsonWorker';
 import JsonSchema from './common/jsonSchema';
-import nls from 'vs/nls';
-import errors from './common/errors';
-import {IRequestService} from 'vs/platform/request/common/request';
 
 export class JSONIntellisense {
 
 	private schemaService: SchemaService.IJSONSchemaService;
-	private requestService: IRequestService;
 	private contributions: JsonWorker.IJSONWorkerContribution[];
 
-	constructor(schemaService: SchemaService.IJSONSchemaService, requestService: IRequestService, contributions: JsonWorker.IJSONWorkerContribution[]) {
+	constructor(schemaService: SchemaService.IJSONSchemaService, contributions: JsonWorker.IJSONWorkerContribution[]) {
 		this.schemaService = schemaService;
-		this.requestService = requestService;
 		this.contributions = contributions;
 	}
 
-	public doSuggest(resource: URI, modelMirror: EditorCommon.IMirrorModel, position: EditorCommon.IPosition): Promise<Modes.ISuggestResult> {
+	public doSuggest(resource: URI, modelMirror: EditorCommon.IMirrorModel, position: EditorCommon.IPosition): Promise<Suggestion> {
 		var currentWord = modelMirror.getWordUntilPosition(position).word;
 
 		var parser = new Parser.JSONParser();
@@ -36,7 +31,7 @@ export class JSONIntellisense {
 
 		var doc = parser.parse(modelMirror.getValue(), config);
 
-		var result: Modes.ISuggestResult = {
+		var result: Suggestion = {
 			currentWord: currentWord,
 			incomplete: false,
 			suggestions: []
@@ -59,7 +54,7 @@ export class JSONIntellisense {
 				result.incomplete = true;
 			},
 			error: (message: string) => {
-				errors.onUnexpectedError(message);
+				throw new Error(message);
 			}
 		};
 
@@ -325,7 +320,7 @@ export class JSONIntellisense {
 				type: this.getSuggestionType(schema.type),
 				label: this.getLabelForValue(schema.default),
 				codeSnippet: this.getTextForValue(schema.default),
-				typeLabel:  nls.localize('json.suggest.default', 'Default value'),
+				typeLabel:  'Default value',
 			});
 		}
 		if (Array.isArray(schema.defaultSnippets)) {
@@ -394,7 +389,7 @@ export class JSONIntellisense {
 		return snippet;
 	}
 
-	private getSuggestionType(type: any): Modes.SuggestionType {
+	private getSuggestionType(type: any): string {
 		if (Array.isArray(type)) {
 			var array = <any[]> type;
 			type = array.length > 0 ? array[0] : null;
@@ -432,7 +427,7 @@ export class JSONIntellisense {
 		result += ': ';
 
 		var defaultVal = propertySchema.default;
-		if (!Types.isUndefined(defaultVal)) {
+		if (!_.isUndefined(defaultVal)) {
 			result = result + this.getTextForEnumValue(defaultVal);
 		} else if (propertySchema.enum && propertySchema.enum.length > 0) {
 			result = result + this.getTextForEnumValue(propertySchema.enum[0]);

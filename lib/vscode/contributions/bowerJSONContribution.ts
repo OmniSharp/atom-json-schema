@@ -4,11 +4,9 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import HtmlContent from './common/htmlContent';
-import Strings from './common/strings';
-import nls from 'vs/nls';
+import HtmlContent from '../common/htmlContent';
+import Strings from '../common/strings';
 import JSONWorker from '../jsonWorker';
-import {IRequestService} from 'vs/platform/request/common/request';
 import URI from '../common/uri';
 import {JSONLocation} from '../parser/jsonLocation';
 
@@ -43,7 +41,7 @@ export class BowerJSONContribution implements JSONWorker.IJSONWorkerContribution
 				'main': '{{pathToMain}}',
 				'dependencies': {}
 			};
-			result.add({ type: 'snippet', label: nls.localize('json.bower.default', 'Default bower.json'), codeSnippet: JSON.stringify(defaultValue, null, '\t'), documentationLabel: '' });
+			result.add({ type: 'snippet', label: 'Default bower.json', codeSnippet: JSON.stringify(defaultValue, null, '\t'), documentationLabel: '' });
 		}
 		return null;
 	}
