@@ -9,8 +9,6 @@ import Parser from './jsonParser';
 import SchemaService from './jsonSchemaService';
 import {IJSONWorkerContribution} from './jsonContributions';
 
-import {Hover, ITextDocument, TextDocumentPosition, Range, MarkedString} from 'vscode-languageserver';
-
 export class JSONHover {
 
 	private schemaService: SchemaService.IJSONSchemaService;

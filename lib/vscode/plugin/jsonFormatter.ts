@@ -5,7 +5,6 @@
 'use strict';
 
 import Json from 'jsonc-parser';
-import {ITextDocument, Range, Position, FormattingOptions, TextEdit} from 'vscode-languageserver';
 
 export function format(document: ITextDocument, range: Range, options: FormattingOptions): TextEdit[] {
 	const documentText = document.getText();

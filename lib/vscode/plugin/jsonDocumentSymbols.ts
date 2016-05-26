@@ -7,8 +7,6 @@
 import Parser from './jsonParser';
 import Strings from './utils/strings';
 
-import {SymbolInformation, SymbolKind, ITextDocument, Range, Location} from 'vscode-languageserver';
-
 export class JSONDocumentSymbols {
 
 	constructor() {

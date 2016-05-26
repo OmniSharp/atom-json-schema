@@ -9,10 +9,6 @@ import Parser from './jsonParser';
 import SchemaService from './jsonSchemaService';
 import JsonSchema from './jsonSchema';
 import {IJSONWorkerContribution} from './jsonContributions';
-
-import {CompletionItem, CompletionItemKind, CompletionList, ITextDocument, TextDocumentPosition, Range, TextEdit, RemoteConsole} from 'vscode-languageserver';
-
-import * as nls from 'vscode-nls';
 const localize = nls.loadMessageBundle();
 
 export interface ISuggestionsCollector {

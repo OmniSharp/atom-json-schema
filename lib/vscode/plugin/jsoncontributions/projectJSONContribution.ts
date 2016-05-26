@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import {MarkedString, CompletionItemKind, CompletionItem} from 'vscode-languageserver';
 import Strings from '../utils/strings';
 import {XHRResponse, getErrorStatusDescription} from 'request-light';
 import {IJSONWorkerContribution, ISuggestionsCollector} from '../jsonContributions';

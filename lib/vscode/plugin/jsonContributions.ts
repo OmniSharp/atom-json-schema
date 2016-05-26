@@ -7,8 +7,6 @@
 import {JSONLocation} from './jsonLocation';
 import {ISuggestionsCollector} from './jsonCompletion';
 
-import {MarkedString, CompletionItem} from 'vscode-languageserver';
-
 export {ISuggestionsCollector} from './jsonCompletion';
 
 

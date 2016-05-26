@@ -4,15 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import {
-	IPCMessageReader, IPCMessageWriter,
-	createConnection, IConnection,
-	TextDocuments, ITextDocument, Diagnostic, DiagnosticSeverity,
-	InitializeParams, InitializeResult, TextDocumentIdentifier, TextDocumentPosition, CompletionList,
-	CompletionItem, Hover, SymbolInformation, DocumentFormattingParams,
-	DocumentRangeFormattingParams, NotificationType, RequestType
-} from 'vscode-languageserver';
-
 import {xhr, XHROptions, XHRResponse, configure as configureHttpRequests} from 'request-light';
 import path from 'path';
 import fs from 'fs';
