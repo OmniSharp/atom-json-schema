@@ -5,7 +5,6 @@
 
 'use strict';
 
-import Objects from './common/objects';
 import Json from './common/json';
 import http from './common/http';
 import {IJSONSchema, IJSONSchemaMap} from './common/jsonSchema';
@@ -13,10 +12,10 @@ import Strings from './common/strings';
 import URI from './common/uri';
 import _ from "lodash";
 import Parser from './parser/jsonParser';
-import {IResourceService, ResourceEvents, IResourceChangedEvent} from 'vs/editor/common/services/resourceService';
-import {IRequestService} from 'vs/platform/request/common/request';
-import {IWorkspaceContextService} from 'vs/platform/workspace/common/workspace';
-import {ISchemaContributions} from 'vs/platform/jsonschemas/common/jsonContributionRegistry';
+//import {IResourceService, ResourceEvents, IResourceChangedEvent} from 'vs/editor/common/services/resourceService';
+//import {IRequestService} from 'vs/platform/request/common/request';
+//import {IWorkspaceContextService} from 'vs/platform/workspace/common/workspace';
+//import {ISchemaContributions} from 'vs/platform/jsonschemas/common/jsonContributionRegistry';
 import {IDisposable, dispose} from './common/lifecycle';
 
 export interface IJSONSchemaService {
@@ -361,7 +360,7 @@ export class JSONSchemaService implements IJSONSchemaService {
         var resolveLink = (node: any, linkedSchema: IJSONSchema, linkPath: string): void => {
             var section = findSection(linkedSchema, linkPath);
             if (typeof section === 'object') {
-                Objects.mixin(node, section, false);
+                _.mixin(node, section, false);
             } else {
                 resolveErrors.push(`$ref '${linkPath}' in ${linkedSchema.id} can not be resolved.`);
             }
