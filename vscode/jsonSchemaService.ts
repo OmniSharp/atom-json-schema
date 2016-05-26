@@ -5,19 +5,19 @@
 
 'use strict';
 
-import Objects from 'vs/base/common/objects';
-import Json from 'vs/base/common/json';
-import http from 'vs/base/common/http';
-import {IJSONSchema, IJSONSchemaMap} from 'vs/base/common/jsonSchema';
-import Strings from 'vs/base/common/strings';
+import Objects from './common/objects';
+import Json from './common/json';
+import http from './common/http';
+import {IJSONSchema, IJSONSchemaMap} from './common/jsonSchema';
+import Strings from './common/strings';
 import URI from './common/uri';
-import Types from 'vs/base/common/types';
+import _ from "lodash";
 import Parser from './parser/jsonParser';
 import {IResourceService, ResourceEvents, IResourceChangedEvent} from 'vs/editor/common/services/resourceService';
 import {IRequestService} from 'vs/platform/request/common/request';
 import {IWorkspaceContextService} from 'vs/platform/workspace/common/workspace';
 import {ISchemaContributions} from 'vs/platform/jsonschemas/common/jsonContributionRegistry';
-import {IDisposable, dispose} from 'vs/base/common/lifecycle';
+import {IDisposable, dispose} from './common/lifecycle';
 
 export interface IJSONSchemaService {
 
@@ -171,17 +171,17 @@ export class ResolvedSchema {
 
         if (schema.properties && schema.properties[next]) {
             return this.getSectionRecursive(path, schema.properties[next]);
-        } else if (Types.isObject(schema.patternProperties)) {
+        } else if (_.isObject(schema.patternProperties)) {
             Object.keys(schema.patternProperties).forEach((pattern) => {
                 var regex = new RegExp(pattern);
                 if (regex.test(next)) {
                     return this.getSectionRecursive(path, schema.patternProperties[pattern]);
                 }
             });
-        } else if (Types.isObject(schema.additionalProperties)) {
+        } else if (_.isObject(schema.additionalProperties)) {
             return this.getSectionRecursive(path, schema.additionalProperties);
         } else if (next.match('[0-9]+')) {
-            if (Types.isObject(schema.items)) {
+            if (_.isObject(schema.items)) {
                 return this.getSectionRecursive(path, schema.items);
             } else if (Array.isArray(schema.items)) {
                 try {

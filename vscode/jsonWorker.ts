@@ -5,21 +5,21 @@
 'use strict';
 
 import URI from './common/uri';
-import Severity from 'vs/base/common/severity';
+import Severity from './common/severity';
 import EditorCommon = require('vs/editor/common/editorCommon');
 import Modes = require('vs/editor/common/modes');
-import HtmlContent = require('vs/base/common/htmlContent');
+import HtmlContent = require('./common/htmlContent');
 import Parser = require('./parser/jsonParser');
-import JSONFormatter = require('vs/base/common/jsonFormatter');
+import JSONFormatter = require('./common/jsonFormatter');
 import SchemaService = require('./jsonSchemaService');
-import JSONSchema = require('vs/base/common/jsonSchema');
+import JSONSchema = require('./common/jsonSchema');
 import JSONIntellisense = require('./jsonIntellisense');
-import Strings = require('vs/base/common/strings');
+import Strings = require('./common/strings');
 import ProjectJSONContribution = require('./contributions/projectJSONContribution');
 import PackageJSONContribution = require('./contributions/packageJSONContribution');
 import BowerJSONContribution = require('./contributions/bowerJSONContribution');
 import GlobPatternContribution = require('./contributions/globPatternContribution');
-import errors = require('vs/base/common/errors');
+import errors = require('./common/errors');
 import {IMarkerService, IMarkerData} from 'vs/platform/markers/common/markers';
 import {IRequestService} from 'vs/platform/request/common/request';
 import {IWorkspaceContextService} from 'vs/platform/workspace/common/workspace';

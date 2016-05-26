@@ -4,8 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import HtmlContent from 'vs/base/common/htmlContent';
-import Strings from 'vs/base/common/strings';
+import HtmlContent from '../common/htmlContent';
+import Strings from '../common/strings';
 import Modes from 'vs/editor/common/modes';
 import nls from 'vs/nls';
 import JSONWorker from '../jsonWorker';

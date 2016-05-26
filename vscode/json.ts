@@ -6,7 +6,7 @@
 
 /*import editorCommon from 'vs/editor/common/editorCommon';
 import modes from 'vs/editor/common/modes';
-import URI from 'vs/base/common/uri';
+import URI from './common/uri';
 import Platform from 'vs/platform/platform';
 import jsonWorker from '../jsonWorker';
 import tokenization from '../features/tokenization';
@@ -16,7 +16,7 @@ import {IThreadService, ThreadAffinity} from 'vs/platform/thread/common/thread';
 import {IJSONContributionRegistry, Extensions, ISchemaContributions} from 'vs/platform/jsonschemas/common/jsonContributionRegistry';
 import {IInstantiationService} from 'vs/platform/instantiation/common/instantiation';
 import {RichEditSupport} from 'vs/editor/common/modes/supports/richEditSupport';
-import {wireCancellationToken} from 'vs/base/common/async';
+import {wireCancellationToken} from './common/async';
 
 export class JSONMode extends AbstractMode {
 

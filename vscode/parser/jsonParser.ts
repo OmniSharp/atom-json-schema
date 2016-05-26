@@ -5,10 +5,9 @@
 'use strict';
 
 import nls from 'vs/nls';
-import Arrays from 'vs/base/common/arrays';
-import Types from 'vs/base/common/types';
-import Json from 'vs/base/common/json';
-import JsonSchema from 'vs/base/common/jsonSchema';
+import _ from 'lodash';
+import Json from '../common/json';
+import JsonSchema from '../common/jsonSchema';
 import {JSONLocation} from './jsonLocation';
 
 export interface IRange {
@@ -102,7 +101,7 @@ export class ASTNode {
 		}
 
 		if (Array.isArray(schema.type)) {
-			if (Arrays.contains(<string[]> schema.type, this.type) === false) {
+			if (_.includes(<string[]> schema.type, this.type) === false) {
 				validationResult.warnings.push({
 					location: { start: this.start, end: this.end },
 					message: schema.errorMessage || nls.localize('typeArrayMismatchWarning', 'Incorrect type. Expected one of {0}', (<string[]> schema.type).join())
@@ -197,7 +196,7 @@ export class ASTNode {
 		}
 
 		if (Array.isArray(schema.enum)) {
-			if (Arrays.contains(schema.enum, this.getValue()) === false) {
+			if (_.includes(schema.enum, this.getValue()) === false) {
 				validationResult.warnings.push({
 					location: { start: this.start, end: this.end },
 					message: nls.localize('enumWarning', 'Value is not an accepted value. Valid values: {0}', JSON.stringify(schema.enum))
@@ -372,7 +371,7 @@ export class NumberASTNode extends ASTNode {
 
 		var val = this.getValue();
 
-		if (Types.isNumber(schema.multipleOf)) {
+		if (_.isNumber(schema.multipleOf)) {
 			if (val % schema.multipleOf !== 0) {
 				validationResult.warnings.push({
 					location: { start: this.start, end: this.end },
@@ -381,7 +380,7 @@ export class NumberASTNode extends ASTNode {
 			}
 		}
 
-		if (!Types.isUndefined(schema.minimum)) {
+		if (!_.isUndefined(schema.minimum)) {
 			if (schema.exclusiveMinimum && val <= schema.minimum) {
 				validationResult.warnings.push({
 					location: { start: this.start, end: this.end },
@@ -396,7 +395,7 @@ export class NumberASTNode extends ASTNode {
 			}
 		}
 
-		if (!Types.isUndefined(schema.maximum)) {
+		if (!_.isUndefined(schema.maximum)) {
 			if (schema.exclusiveMaximum && val >= schema.maximum) {
 				validationResult.warnings.push({
 					location: { start: this.start, end: this.end },
@@ -618,7 +617,7 @@ export class ObjectASTNode extends ASTNode {
 			});
 		}
 
-		if (Types.isObject(schema.additionalProperties)) {
+		if (_.isObject(schema.additionalProperties)) {
 			unprocessedProperties.forEach((propertyName: string) => {
 				var child = seenKeys[propertyName];
 				if (child) {
@@ -661,7 +660,7 @@ export class ObjectASTNode extends ASTNode {
 			}
 		}
 
-		if (Types.isObject(schema.dependencies)) {
+		if (_.isObject(schema.dependencies)) {
 			Object.keys(schema.dependencies).forEach((key: string) => {
 				var prop = seenKeys[key];
 				if (prop) {
@@ -677,7 +676,7 @@ export class ObjectASTNode extends ASTNode {
 								validationResult.propertiesValueMatches++;
 							}
 						});
-					} else if (Types.isObject(schema.dependencies[key])) {
+					} else if (_.isObject(schema.dependencies[key])) {
 						var valueAsSchema:JsonSchema.IJSONSchema = schema.dependencies[key];
 						var propertyvalidationResult = new ValidationResult();
 						this.validate(valueAsSchema, propertyvalidationResult, matchingSchemas, offset);

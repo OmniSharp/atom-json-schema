@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import json from 'vs/base/common/json';
+import json from '../common/json';
 import Modes from 'vs/editor/common/modes';
 import jsonTokenTypes from '../features/jsonTokenTypes';
 

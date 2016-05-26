@@ -7,11 +7,11 @@
 import URI from './common/uri';
 import Parser from './parser/jsonParser';
 import SchemaService from './jsonSchemaService';
-import Types from 'vs/base/common/types';
+import _ from 'lodash';
 import JsonWorker from './jsonWorker';
-import JsonSchema from 'vs/base/common/jsonSchema';
+import JsonSchema from './common/jsonSchema';
 import nls from 'vs/nls';
-import errors from 'vs/base/common/errors';
+import errors from './common/errors';
 import {IRequestService} from 'vs/platform/request/common/request';
 
 export class JSONIntellisense {
