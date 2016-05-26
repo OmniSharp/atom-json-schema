@@ -28,7 +28,7 @@ export class JSONDocumentSymbols {
 					if (item.type === 'object') {
 						let property = (<Parser.ObjectASTNode>item).getFirstProperty('key');
 						if (property && property.value) {
-							let location = Location.create(document.uri, Range.create(document.positionAt(item.start), document.positionAt(item.end)));
+							let location = Location.create(document.uri, new Range(document.positionAt(item.start), document.positionAt(item.end)));
 							result.push({ name: property.value.getValue(), kind: SymbolKind.Function, location: location });
 						}
 					}
@@ -46,7 +46,7 @@ export class JSONDocumentSymbols {
 				let objectNode = <Parser.ObjectASTNode>node;
 
 				objectNode.properties.forEach((property: Parser.PropertyASTNode) => {
-					let location = Location.create(document.uri, Range.create(document.positionAt(property.start), document.positionAt(property.end)));
+					let location = Location.create(document.uri, new Range(document.positionAt(property.start), document.positionAt(property.end)));
 					let valueNode = property.value;
 					if (valueNode) {
 						let childContainerName = containerName ? containerName + '.' + property.key.name : property.key.name;

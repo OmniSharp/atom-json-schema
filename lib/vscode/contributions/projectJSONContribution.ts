@@ -35,7 +35,7 @@ export class ProjectJSONContribution implements JSONWorker.IJSONWorkerContributi
                     'dnxcore50': {}
                 }
             };
-            result.add({ type: 'snippet', text: `Default project.json`, snippet: JSON.stringify(defaultValue, null, '\t'), description: '' });
+            result.add({ type: 'snippet', displayText: `Default project.json`, snippet: JSON.stringify(defaultValue, null, '\t'), description: '' });
         }
         return null;
     }
@@ -80,7 +80,7 @@ export class ProjectJSONContribution implements JSONWorker.IJSONWorkerContributi
                                             codeSnippet += ',';
                                         }
                                     }
-                                    result.add({ type: 'property', text: name, snippet: codeSnippet, className: typeLabel, description: documentation });
+                                    result.add({ type: 'property', displayText: name, snippet: codeSnippet, className: typeLabel, description: documentation });
                                 }
                             }
                             if (results.length === LIMIT) {
@@ -127,7 +127,7 @@ export class ProjectJSONContribution implements JSONWorker.IJSONWorkerContributi
                                 if (isLatest) {
                                     documentationLabel = `The currently latest version of the package`;
                                 }
-                                result.add({ type: 'class', text: label, snippet: name, description: documentationLabel });
+                                result.add({ type: 'class', displayText: label, snippet: name, description: documentationLabel });
                             }
                         }
                         if (results.length === LIMIT) {

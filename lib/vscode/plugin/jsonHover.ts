@@ -39,7 +39,7 @@ export class JSONHover {
 		}
 
 		var createHover = (contents: MarkedString[]) => {
-			let range = Range.create(document.positionAt(node.start), document.positionAt(node.end));
+			let range = new Range(document.positionAt(node.start), document.positionAt(node.end));
 			let result: Hover = {
 				contents: contents,
 				range: range

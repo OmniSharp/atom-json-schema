@@ -9,28 +9,34 @@ import Parser from './jsonParser';
 import SchemaService from './jsonSchemaService';
 import JsonSchema from './jsonSchema';
 import {IJSONWorkerContribution} from './jsonContributions';
-const localize = nls.loadMessageBundle();
+import TextBuffer from "text-buffer";
+const Range = TextBuffer.Range;
 
 export interface ISuggestionsCollector {
-	add(suggestion: CompletionItem): void;
+	add(suggestion: Suggestion): void;
 	error(message:string): void;
 	log(message:string): void;
 	setAsIncomplete(): void;
+}
+
+export interface CompletionList {
+    items: Suggestion[],
+    isIncomplete: boolean;
 }
 
 export class JSONCompletion {
 
 	private schemaService: SchemaService.IJSONSchemaService;
 	private contributions: IJSONWorkerContribution[];
-	private console: RemoteConsole;
+	private console: Console;
 
-	constructor(schemaService: SchemaService.IJSONSchemaService, console: RemoteConsole, contributions: IJSONWorkerContribution[] = []) {
+	constructor(schemaService: SchemaService.IJSONSchemaService, contributions: IJSONWorkerContribution[] = []) {
 		this.schemaService = schemaService;
 		this.contributions = contributions;
 		this.console = console;
 	}
 
-	public doResolve(item: CompletionItem) : Thenable<CompletionItem> {
+	public doResolve(item: Suggestion) : Thenable<Suggestion> {
 		for (let i = this.contributions.length - 1; i >= 0; i--) {
 			if (this.contributions[i].resolveSuggestion) {
 				let resolver = this.contributions[i].resolveSuggestion(item);
@@ -42,7 +48,7 @@ export class JSONCompletion {
 		return Promise.resolve(item);
 	}
 
-	public doSuggest(document: ITextDocument, textDocumentPosition: TextDocumentPosition, doc: Parser.JSONDocument): Thenable<CompletionList> {
+	public doSuggest(document: Atom.TextEditor, textDocumentPosition: TextDocumentPosition, doc: Parser.JSONDocument): Thenable<CompletionList> {
 
 		let offset = document.offsetAt(textDocumentPosition.position);
 		let node = doc.getNodeFromOffsetEndInclusive(offset);
@@ -55,18 +61,18 @@ export class JSONCompletion {
 		};
 
 		if (node && (node.type === 'string' || node.type === 'number' || node.type === 'boolean' || node.type === 'null')) {
-			overwriteRange = Range.create(document.positionAt(node.start), document.positionAt(node.end));
+			overwriteRange = new Range(document.positionAt(node.start), document.positionAt(node.end));
 		} else {
-			overwriteRange = Range.create(document.positionAt(offset - currentWord.length), textDocumentPosition.position);
+			overwriteRange = new Range(document.positionAt(offset - currentWord.length), textDocumentPosition.position);
 		}
 
 		let proposed: { [key: string]: boolean } = {};
 		let collector: ISuggestionsCollector = {
-			add: (suggestion: CompletionItem) => {
-				if (!proposed[suggestion.label]) {
-					proposed[suggestion.label] = true;
+			add: (suggestion: Suggestion) => {
+				if (!proposed[suggestion.text]) {
+					proposed[suggestion.text] = true;
 					if (overwriteRange) {
-						suggestion.textEdit = TextEdit.replace(overwriteRange, suggestion.insertText);
+						suggestion.text = TextEdit.replace(overwriteRange, suggestion.insertText);
 					}
 
 					result.items.push(suggestion);
@@ -188,7 +194,7 @@ export class JSONCompletion {
 				if (schemaProperties) {
 					Object.keys(schemaProperties).forEach((key: string) => {
 						let propertySchema = schemaProperties[key];
-						collector.add({ kind: CompletionItemKind.Property, label: key, insertText: this.getTextForProperty(key, propertySchema, addValue, isLast), documentation: propertySchema.description || '' });
+						collector.add({ type: "property", displayText: key, text: this.getTextForProperty(key, propertySchema, addValue, isLast), description: propertySchema.description || '' });
 					});
 				}
 			}
@@ -199,7 +205,7 @@ export class JSONCompletion {
 		let collectSuggestionsForSimilarObject = (obj: Parser.ObjectASTNode) => {
 			obj.properties.forEach((p) => {
 				let key = p.key.value;
-				collector.add({ kind: CompletionItemKind.Property, label: key, insertText: this.getTextForSimilarProperty(key, p.value), documentation: '' });
+				collector.add({ type: "property", displayText: key, text: this.getTextForSimilarProperty(key, p.value), description: '' });
 			});
 		};
 		if (node.parent) {
@@ -222,7 +228,7 @@ export class JSONCompletion {
 			}
 		}
 		if (!currentKey && currentWord.length > 0) {
-			collector.add({ kind: CompletionItemKind.Property, label: this.getLabelForValue(currentWord), insertText: this.getTextForProperty(currentWord, null, true, isLast), documentation: '' });
+			collector.add({ type: "property", displayText: this.getLabelForValue(currentWord), text: this.getTextForProperty(currentWord, null, true, isLast), description: '' });
 		}
 	}
 
@@ -230,7 +236,7 @@ export class JSONCompletion {
 		let collectSuggestionsForValues = (value: Parser.ASTNode) => {
 			if (!value.contains(offset)) {
 				let content = this.getTextForMatchingNode(value, document);
-				collector.add({ kind: this.getSuggestionKind(value.type), label: content, insertText: content, documentation: '' });
+				collector.add({ type: this.getSuggestionKind(value.type), displayText: content, text: content, description: '' });
 			}
 			if (value.type === 'boolean') {
 				this.addBooleanSuggestion(!value.getValue(), collector);
@@ -238,8 +244,8 @@ export class JSONCompletion {
 		};
 
 		if (!node) {
-			collector.add({ kind: this.getSuggestionKind('object'), label: 'Empty object', insertText: '{\n\t{{}}\n}', documentation: '' });
-			collector.add({ kind: this.getSuggestionKind('array'), label: 'Empty array', insertText: '[\n\t{{}}\n]', documentation: '' });
+			collector.add({ type: this.getSuggestionKind('object'), displayText: 'Empty object', text: '{\n\t{{}}\n}', description: '' });
+			collector.add({ type: this.getSuggestionKind('array'), displayText: 'Empty array', text: '[\n\t{{}}\n]', description: '' });
 		} else {
 			if (node.type === 'property' && offset > (<Parser.PropertyASTNode>node).colonOffset) {
 				let valueNode = (<Parser.PropertyASTNode>node).value;
@@ -317,16 +323,16 @@ export class JSONCompletion {
 	}
 
 	private addBooleanSuggestion(value: boolean, collector: ISuggestionsCollector): void {
-		collector.add({ kind: this.getSuggestionKind('boolean'), label: value ? 'true' : 'false', insertText: this.getTextForValue(value), documentation: '' });
+		collector.add({ type: this.getSuggestionKind('boolean'), displayText: value ? 'true' : 'false', text: this.getTextForValue(value), description: '' });
 	}
 
 	private addNullSuggestion(collector: ISuggestionsCollector): void {
-		collector.add({ kind: this.getSuggestionKind('null'), label: 'null', insertText: 'null', documentation: '' });
+		collector.add({ type: this.getSuggestionKind('null'), displayText: 'null', text: 'null', description: '' });
 	}
 
 	private addEnumSuggestion(schema: JsonSchema.IJSONSchema, collector: ISuggestionsCollector): void {
 		if (Array.isArray(schema.enum)) {
-			schema.enum.forEach((enm) => collector.add({ kind: this.getSuggestionKind(schema.type), label: this.getLabelForValue(enm), insertText: this.getTextForValue(enm), documentation: '' }));
+			schema.enum.forEach((enm) => collector.add({ type: this.getSuggestionKind(schema.type), displayText: this.getLabelForValue(enm), text: this.getTextForValue(enm), description: '' }));
 		} else {
 			if (this.isType(schema, 'boolean')) {
 				this.addBooleanSuggestion(true, collector);
@@ -357,18 +363,18 @@ export class JSONCompletion {
 	private addDefaultSuggestion(schema: JsonSchema.IJSONSchema, collector: ISuggestionsCollector): void {
 		if (schema.default) {
 			collector.add({
-				kind: this.getSuggestionKind(schema.type),
-				label: this.getLabelForValue(schema.default),
-				insertText: this.getTextForValue(schema.default),
-				detail: localize('json.suggest.default', 'Default value'),
+				type: this.getSuggestionKind(schema.type),
+				displayText: this.getLabelForValue(schema.default),
+				text: this.getTextForValue(schema.default),
+				description: 'Default value',
 			});
 		}
 		if (Array.isArray(schema.defaultSnippets)) {
 			schema.defaultSnippets.forEach(s => {
 				collector.add({
-					kind: CompletionItemKind.Snippet,
-					label: this.getLabelForSnippetValue(s.body),
-					insertText: this.getTextForSnippetValue(s.body)
+					type: "snippet",
+					displayText: this.getLabelForSnippetValue(s.body),
+					text: this.getTextForSnippetValue(s.body)
 				});
 			});
 		}
@@ -428,19 +434,19 @@ export class JSONCompletion {
 		return snippet;
 	}
 
-	private getSuggestionKind(type: any): CompletionItemKind {
+	private getSuggestionKind(type: any): string {
 		if (Array.isArray(type)) {
 			let array = <any[]>type;
 			type = array.length > 0 ? array[0] : null;
 		}
 		if (!type) {
-			return CompletionItemKind.Value;
+			return "value";
 		}
 		switch (type) {
-			case 'string': return CompletionItemKind.Value;
-			case 'object': return CompletionItemKind.Module;
-			case 'property': return CompletionItemKind.Property;
-			default: return CompletionItemKind.Value;
+			case 'string': return "value";
+			case 'object': return "module";
+			case 'property': return "property";
+			default: return "value";
 		}
 	}
 

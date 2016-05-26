@@ -20,12 +20,12 @@ export function format(document: ITextDocument, range: Range, options: Formattin
 		while (endOffset > endLineStart && isEOL(documentText, endOffset - 1)) {
 			endOffset--;
 		}
-		range = Range.create(startPosition, document.positionAt(endOffset));
+		range = new Range(startPosition, document.positionAt(endOffset));
 		value = documentText.substring(rangeOffset, endOffset);
 		initialIndentLevel = computeIndentLevel(value, 0, options);
 	} else {
 		value = documentText;
-		range = Range.create(Position.create(0, 0), document.positionAt(value.length));
+		range = new Range(Position.create(0, 0), document.positionAt(value.length));
 		initialIndentLevel = 0;
 		rangeOffset = 0;
 	}
@@ -57,7 +57,7 @@ export function format(document: ITextDocument, range: Range, options: Formattin
 	let editOperations: TextEdit[] = [];
 	function addEdit(text: string, startOffset: number, endOffset: number) {
 		if (documentText.substring(startOffset, endOffset) !== text) {
-			let replaceRange = Range.create(document.positionAt(startOffset), document.positionAt(endOffset));
+			let replaceRange = new Range(document.positionAt(startOffset), document.positionAt(endOffset));
 			editOperations.push(TextEdit.replace(replaceRange, text));
 		}
 	}
