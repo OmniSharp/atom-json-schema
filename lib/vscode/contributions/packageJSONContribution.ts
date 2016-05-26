@@ -6,9 +6,7 @@
 
 import HtmlContent from '../common/htmlContent';
 import Strings from '../common/strings';
-import nls from 'vs/nls';
 import JSONWorker from '../jsonWorker';
-import {IRequestService} from 'vs/platform/request/common/request';
 import URI from '../common/uri';
 import {JSONLocation} from '../parser/jsonLocation';
 
@@ -44,7 +42,7 @@ export class PackageJSONContribution implements JSONWorker.IJSONWorkerContributi
 				'main': '{{pathToMain}}',
 				'dependencies': {}
 			};
-			result.add({ type: 'module', label: nls.localize('json.package.default', 'Default package.json'), codeSnippet: JSON.stringify(defaultValue, null, '\t'), documentationLabel: '' });
+			result.add({ type: 'module', text: `Default package.json`, snippet: JSON.stringify(defaultValue, null, '\t'), description: '' });
 		}
 		return null;
 	}
@@ -74,7 +72,7 @@ export class PackageJSONContribution implements JSONWorker.IJSONWorkerContributi
 												codeSnippet += ',';
 											}
 										}
-										result.add({ type: 'property', label: name, codeSnippet: codeSnippet, documentationLabel: '' });
+										result.add({ type: 'property', text: name, snippet: codeSnippet, description: '' });
 									}
 								}
 								if (results.length === LIMIT) {
@@ -85,11 +83,11 @@ export class PackageJSONContribution implements JSONWorker.IJSONWorkerContributi
 							// ignore
 						}
 					} else {
-						result.error(nls.localize('json.npm.error.repoaccess', 'Request to the NPM repository failed: {0}', success.responseText));
+						result.error(`Request to the NPM repository failed: ${success.responseText}`);
 						return 0;
 					}
 				}, (error) => {
-					result.error(nls.localize('json.npm.error.repoaccess', 'Request to the NPM repository failed: {0}', error.responseText));
+					result.error(`Request to the NPM repository failed: ${error.responseText}`);
 					return 0;
 				});
 			} else {
@@ -101,7 +99,7 @@ export class PackageJSONContribution implements JSONWorker.IJSONWorkerContributi
 							codeSnippet += ',';
 						}
 					}
-					result.add({ type: 'property', label: name, codeSnippet: codeSnippet, documentationLabel: '' });
+					result.add({ type: 'property', text: name, snippet: codeSnippet, description: '' });
 				});
 				result.setAsIncomplete();
 			}
@@ -121,11 +119,11 @@ export class PackageJSONContribution implements JSONWorker.IJSONWorkerContributi
 					if (obj && obj.version) {
 						var version = obj.version;
 						var name = JSON.stringify(version);
-						result.add({ type: 'class', label: name, codeSnippet: name, documentationLabel: nls.localize('json.npm.latestversion', 'The currently latest version of the package') });
+						result.add({ type: 'class', text: name, snippet: name, description: `The currently latest version of the package` });
 						name = JSON.stringify('^' + version);
-						result.add({ type: 'class', label: name, codeSnippet: name, documentationLabel: nls.localize('json.npm.majorversion', 'Matches the most recent major version (1.x.x)') });
+						result.add({ type: 'class', text: name, snippet: name, description: `Matches the most recent major version (1.x.x)` });
 						name = JSON.stringify('~' + version);
-						result.add({ type: 'class', label: name, codeSnippet: name, documentationLabel: nls.localize('json.npm.minorversion', 'Matches the most recent minor version (1.2.x)') });
+						result.add({ type: 'class', text: name, snippet: name, description: `Matches the most recent minor version (1.2.x)` });
 					}
 				} catch (e) {
 					// ignore
@@ -157,7 +155,7 @@ export class PackageJSONContribution implements JSONWorker.IJSONWorkerContributi
 							htmlContent.push({className: 'documentation', text: obj.description });
 						}
 						if (obj.version) {
-							htmlContent.push({className: 'documentation', text: nls.localize('json.npm.version.hover', 'Latest version: {0}', obj.version) });
+							htmlContent.push({className: 'documentation', text: `Latest version: ${obj.version}` });
 						}
 					}
 				} catch (e) {

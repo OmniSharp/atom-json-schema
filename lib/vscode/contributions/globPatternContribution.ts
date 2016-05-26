@@ -10,19 +10,19 @@ import JSONWorker from '../jsonWorker';
 import URI from '../common/uri';
 import {JSONLocation} from '../parser/jsonLocation';
 
-var globProperties:Modes.ISuggestion[] = [
-    { type: 'value', label: nls.localize('fileLabel', "Files by Extension"), codeSnippet: '"**/*.{{extension}}": true', documentationLabel: nls.localize('fileDescription', "Match all files of a specific file extension.")},
-    { type: 'value', label: nls.localize('filesLabel', "Files with Multiple Extensions"), codeSnippet: '"**/*.{ext1,ext2,ext3}": true', documentationLabel: nls.localize('filesDescription', "Match all files with any of the file extensions.")},
-    { type: 'value', label: nls.localize('derivedLabel', "Files with Siblings by Name"), codeSnippet: '"**/*.{{source-extension}}": { "when": "$(basename).{{target-extension}}" }', documentationLabel: nls.localize('derivedDescription', "Match files that have siblings with the same name but a different extension.")},
-    { type: 'value', label: nls.localize('topFolderLabel', "Folder by Name (Top Level)"), codeSnippet: '"{{name}}": true', documentationLabel: nls.localize('topFolderDescription', "Match a top level folder with a specific name.")},
-    { type: 'value', label: nls.localize('topFoldersLabel', "Folders with Multiple Names (Top Level)"), codeSnippet: '"{folder1,folder2,folder3}": true', documentationLabel: nls.localize('topFoldersDescription', "Match multiple top level folders.")},
-    { type: 'value', label: nls.localize('folderLabel', "Folder by Name (Any Location)"), codeSnippet: '"**/{{name}}": true', documentationLabel: nls.localize('folderDescription', "Match a folder with a specific name in any location.")},
+var globProperties:Suggestion[] = [
+    { type: 'value', displayText: `Files by Extension`, snippet: '"**/*.{{extension}}": true', description: `Match all files of a specific file extension.`},
+    { type: 'value', displayText: `Files with Multiple Extensions`, snippet: '"**/*.{ext1,ext2,ext3}": true', description: `Match all files with any of the file extensions.`},
+    { type: 'value', displayText: `Files with Siblings by Name`, snippet: '"**/*.{{source-extension}}": { "when": "$(basename).{{target-extension}}" }', description: `Match files that have siblings with the same name but a different extension.`},
+    { type: 'value', displayText: `Folder by Name (Top Level)`, snippet: '"{{name}}": true', description: `Match a top level folder with a specific name.`},
+    { type: 'value', displayText: `Folders with Multiple Names (Top Level)`, snippet: '"{folder1,folder2,folder3}": true', description: `Match multiple top level folders.`},
+    { type: 'value', displayText: `Folder by Name (Any Location)`, snippet: '"**/{{name}}": true', description: `Match a folder with a specific name in any location.`},
 ];
 
-var globValues:Modes.ISuggestion[] = [
-    { type: 'value', label: nls.localize('trueLabel', "True"), codeSnippet: 'true', documentationLabel: nls.localize('trueDescription', "Enable the pattern.")},
-    { type: 'value', label: nls.localize('falseLabel', "False"), codeSnippet: 'false', documentationLabel: nls.localize('falseDescription', "Disable the pattern.")},
-    { type: 'value', label: nls.localize('derivedLabel', "Files with Siblings by Name"), codeSnippet: '{ "when": "$(basename).{{extension}}" }', documentationLabel: nls.localize('siblingsDescription', "Match files that have siblings with the same name but a different extension.")}
+var globValues:Suggestion[] = [
+    { type: 'value', displayText: `True`, snippet: 'true', description: `Enable the pattern.`},
+    { type: 'value', displayText: `False`, snippet: 'false', description: `Disable the pattern.`},
+    { type: 'value', displayText: `Files with Siblings by Name`, snippet: '{ "when": "$(basename).{{extension}}" }', description: `Match files that have siblings with the same name but a different extension.`}
 ];
 
 export class GlobPatternContribution implements JSONWorker.IJSONWorkerContribution {
