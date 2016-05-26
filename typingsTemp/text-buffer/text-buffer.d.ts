@@ -1220,17 +1220,17 @@ declare module TextBuffer {
         /**
          * This field or method was not documented by atomdoc, assume it is private. Use with caution.
          */
-        static Point: Point;
+        static Point: typeof Point;
 
         /**
          * This field or method was not documented by atomdoc, assume it is private. Use with caution.
          */
-        static Range: TextBuffer.Range;
+        static Range: typeof Range;
 
         /**
          * This field or method was not documented by atomdoc, assume it is private. Use with caution.
          */
-        static Patch: Patch;
+        static Patch: typeof Patch;
 
         /**
          * This field or method was not documented by atomdoc, assume it is private. Use with caution.
@@ -1837,7 +1837,7 @@ declare module TextBuffer {
          * The position is clipped prior to translating.
          * @param position? - A {Point}.
          */
-        characterIndexForPosition(position? : Point) : Point;
+        characterIndexForPosition(position? : Point) : number;
 
         /**
          * Convert an absolute character offset, inclusive of newlines, to a

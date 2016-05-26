@@ -34,7 +34,7 @@ export interface IJSONSchemaService {
 	/**
 	 * Looks up the appropriate schema for the given URI
 	 */
-	getSchemaForResource(resource: string, document: Parser.JSONDocument): Thenable<ResolvedSchema>;
+	getSchemaForResource(resource: string, document: Parser.JSONDocument): Promise<ResolvedSchema>;
 }
 
 export interface ISchemaAssociations {
@@ -55,12 +55,12 @@ export interface ISchemaHandle {
 	/**
 	 * The schema from the file, with potential $ref references
 	 */
-	getUnresolvedSchema(): Thenable<UnresolvedSchema>;
+	getUnresolvedSchema(): Promise<UnresolvedSchema>;
 
 	/**
 	 * The schema from the file, with references resolved
 	 */
-	getResolvedSchema(): Thenable<ResolvedSchema>;
+	getResolvedSchema(): Promise<ResolvedSchema>;
 }
 
 
@@ -104,8 +104,8 @@ class SchemaHandle implements ISchemaHandle {
 
 	public url: string;
 
-	private resolvedSchema: Thenable<ResolvedSchema>;
-	private unresolvedSchema: Thenable<UnresolvedSchema>;
+	private resolvedSchema: Promise<ResolvedSchema>;
+	private unresolvedSchema: Promise<UnresolvedSchema>;
 	private service: JSONSchemaService;
 
 	constructor(service: JSONSchemaService, url: string, unresolvedSchemaContent?: IJSONSchema) {
@@ -116,14 +116,14 @@ class SchemaHandle implements ISchemaHandle {
 		}
 	}
 
-	public getUnresolvedSchema(): Thenable<UnresolvedSchema> {
+	public getUnresolvedSchema(): Promise<UnresolvedSchema> {
 		if (!this.unresolvedSchema) {
 			this.unresolvedSchema = this.service.loadSchema(this.url);
 		}
 		return this.unresolvedSchema;
 	}
 
-	public getResolvedSchema(): Thenable<ResolvedSchema> {
+	public getResolvedSchema(): Promise<ResolvedSchema> {
 		if (!this.resolvedSchema) {
 			this.resolvedSchema = this.getUnresolvedSchema().then(unresolved => {
 				return this.service.resolveSchemaContent(unresolved);
@@ -208,7 +208,7 @@ export interface IWorkspaceContextService {
 }
 
 export interface IRequestService {
-	(options: XHROptions): Thenable<XHRResponse>;
+	(options: XHROptions): Promise<XHRResponse>;
 }
 
 export class JSONSchemaService implements IJSONSchemaService {
@@ -332,7 +332,7 @@ export class JSONSchemaService implements IJSONSchemaService {
 		}
 	}
 
-	public getResolvedSchema(schemaId: string): Thenable<ResolvedSchema> {
+	public getResolvedSchema(schemaId: string): Promise<ResolvedSchema> {
 		let id = this.normalizeId(schemaId);
 		let schemaHandle = this.schemasById[id];
 		if (schemaHandle) {
@@ -341,7 +341,7 @@ export class JSONSchemaService implements IJSONSchemaService {
 		return Promise.resolve(null);
 	}
 
-	public loadSchema(url: string): Thenable<UnresolvedSchema> {
+	public loadSchema(url: string): Promise<UnresolvedSchema> {
 		if (this.telemetryService && url.indexOf('//schema.management.azure.com/') !== -1) {
 			this.telemetryService.log('json.schema', {
 				schemaURL: url
@@ -369,7 +369,7 @@ export class JSONSchemaService implements IJSONSchemaService {
 		);
 	}
 
-	public resolveSchemaContent(schemaToResolve: UnresolvedSchema): Thenable<ResolvedSchema> {
+	public resolveSchemaContent(schemaToResolve: UnresolvedSchema): Promise<ResolvedSchema> {
 
 		let resolveErrors: string[] = schemaToResolve.errors.slice(0);
 		let schema = schemaToResolve.schema;
@@ -400,7 +400,7 @@ export class JSONSchemaService implements IJSONSchemaService {
 			delete node.$ref;
 		};
 
-		let resolveExternalLink = (node: any, uri: string, linkPath: string): Thenable<any> => {
+		let resolveExternalLink = (node: any, uri: string, linkPath: string): Promise<any> => {
 			return this.getOrAddSchemaHandle(uri).getUnresolvedSchema().then(unresolvedSchema => {
 				if (unresolvedSchema.errors.length) {
 					let loc = linkPath ? uri + '#' + linkPath : uri;
@@ -411,11 +411,11 @@ export class JSONSchemaService implements IJSONSchemaService {
 			});
 		};
 
-		let resolveRefs = (node: IJSONSchema, parentSchema: IJSONSchema): Thenable<any> => {
+		let resolveRefs = (node: IJSONSchema, parentSchema: IJSONSchema): Promise<any> => {
 			let toWalk : IJSONSchema[] = [node];
 			let seen: IJSONSchema[] = [];
 
-			let openPromises: Thenable<any>[] = [];
+			let openPromises: Promise<any>[] = [];
 
 			let collectEntries = (...entries: IJSONSchema[]) => {
 				for (let entry of entries) {
@@ -466,7 +466,7 @@ export class JSONSchemaService implements IJSONSchemaService {
 		return resolveRefs(schema, schema).then(_ => new ResolvedSchema(schema, resolveErrors));
 	}
 
-	public getSchemaForResource(resource: string, document: Parser.JSONDocument): Thenable<ResolvedSchema> {
+	public getSchemaForResource(resource: string, document: Parser.JSONDocument): Promise<ResolvedSchema> {
 
 		// first use $schema if present
 		if (document && document.root && document.root.type === 'object') {

@@ -54,3 +54,8 @@ interface Suggestion {
     descriptionMoreURL?: string;
     className?: string;
 }
+
+declare type MarkedString = string | {
+    language: string;
+    value: string;
+};

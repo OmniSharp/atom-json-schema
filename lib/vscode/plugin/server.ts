@@ -83,7 +83,7 @@ let telemetry = {
 	}
 };
 
-let request = (options: XHROptions): Thenable<XHRResponse> => {
+let request = (options: XHROptions): Promise<XHRResponse> => {
 	if (Strings.startsWith(options.url, 'file://')) {
 		let fsPath = URI.parse(options.url).fsPath;
 		return new Promise<XHRResponse>((c, e) => {
@@ -200,7 +200,7 @@ function updateConfiguration() {
 }
 
 
-function validateTextDocument(textDocument: ITextDocument): void {
+function validateTextDocument(textDocument: Atom.TextEditor): void {
 	if (textDocument.getText().length === 0) {
 		// ignore empty documents
 		connection.sendDiagnostics({ uri: textDocument.uri, diagnostics: [] });
@@ -260,27 +260,27 @@ connection.onDidChangeWatchedFiles((change) => {
 	}
 });
 
-function getJSONDocument(document: ITextDocument): JSONDocument {
+function getJSONDocument(document: Atom.TextEditor): JSONDocument {
 	return parseJSON(document.getText());
 }
 
-connection.onCompletion((textDocumentPosition: TextDocumentPosition): Thenable<CompletionList> => {
+connection.onCompletion((textDocumentPosition: TextBuffer.Point): Promise<CompletionList> => {
 	let document = documents.get(textDocumentPosition.uri);
 	let jsonDocument = getJSONDocument(document);
 	return jsonCompletion.doSuggest(document, textDocumentPosition, jsonDocument);
 });
 
-connection.onCompletionResolve((item: CompletionItem) : Thenable<CompletionItem> => {
+connection.onCompletionResolve((item: CompletionItem) : Promise<CompletionItem> => {
 	return jsonCompletion.doResolve(item);
 });
 
-connection.onHover((textDocumentPosition: TextDocumentPosition): Thenable<Hover> => {
+connection.onHover((textDocumentPosition: TextBuffer.Point): Promise<Hover> => {
 	let document = documents.get(textDocumentPosition.uri);
 	let jsonDocument = getJSONDocument(document);
 	return jsonHover.doHover(document, textDocumentPosition, jsonDocument);
 });
 
-connection.onDocumentSymbol((textDocumentIdentifier: TextDocumentIdentifier): Thenable<SymbolInformation[]> => {
+connection.onDocumentSymbol((textDocumentIdentifier: TextDocumentIdentifier): Promise<SymbolInformation[]> => {
 	let document = documents.get(textDocumentIdentifier.uri);
 	let jsonDocument = getJSONDocument(document);
 	return jsonDocumentSymbols.compute(document, jsonDocument);

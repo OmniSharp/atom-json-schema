@@ -19,7 +19,7 @@ export class JSONHover {
 		this.contributions = contributions;
 	}
 
-	public doHover(document: ITextDocument, textDocumentPosition: TextDocumentPosition, doc: Parser.JSONDocument): Thenable<Hover> {
+	public doHover(document: Atom.TextEditor, textDocumentPosition: TextBuffer.Point, doc: Parser.JSONDocument): Promise<Hover> {
 
 		let offset = document.offsetAt(textDocumentPosition.position);
 		let node = doc.getNodeFromOffset(offset);

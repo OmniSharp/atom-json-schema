@@ -6,7 +6,7 @@
 
 import Json from 'jsonc-parser';
 
-export function format(document: ITextDocument, range: Range, options: FormattingOptions): TextEdit[] {
+export function format(document: Atom.TextEditor, range: Range, options: FormattingOptions): TextEdit[] {
 	const documentText = document.getText();
 	let initialIndentLevel: number;
 	let value: string;
@@ -162,7 +162,7 @@ function computeIndentLevel(content: string, offset: number, options: Formatting
 	return Math.floor(nChars / tabSize);
 }
 
-function getEOL(document: ITextDocument): string {
+function getEOL(document: Atom.TextEditor): string {
 	let text = document.getText();
 	if (document.lineCount > 1) {
 		let to = document.offsetAt(Position.create(1, 0));

@@ -63,7 +63,7 @@ export class JSONMode extends AbstractMode {
 		});
 
 		modes.HoverProviderRegistry.register(this.getId(), {
-			provideHover: (model, position, token): Thenable<modes.Hover> => {
+			provideHover: (model, position, token): Promise<modes.Hover> => {
 				return wireCancellationToken(token, this._provideHover(model.uri, position));
 			}
 		}, true);
@@ -74,26 +74,26 @@ export class JSONMode extends AbstractMode {
 
 		// Initialize Outline support
 		modes.DocumentSymbolProviderRegistry.register(this.getId(), {
-			provideDocumentSymbols: (model, token): Thenable<modes.SymbolInformation[]> => {
+			provideDocumentSymbols: (model, token): Promise<modes.SymbolInformation[]> => {
 				return wireCancellationToken(token, this._provideDocumentSymbols(model.uri));
 			}
 		}, true);
 
 		modes.DocumentFormattingEditProviderRegistry.register(this.getId(), {
-			provideDocumentFormattingEdits: (model, options, token): Thenable<editorCommon.ISingleEditOperation[]> => {
+			provideDocumentFormattingEdits: (model, options, token): Promise<editorCommon.ISingleEditOperation[]> => {
 				return wireCancellationToken(token, this._provideDocumentFormattingEdits(model.uri, options));
 			}
 		}, true);
 
 		modes.DocumentRangeFormattingEditProviderRegistry.register(this.getId(), {
-			provideDocumentRangeFormattingEdits: (model, range, options, token): Thenable<editorCommon.ISingleEditOperation[]> => {
+			provideDocumentRangeFormattingEdits: (model, range, options, token): Promise<editorCommon.ISingleEditOperation[]> => {
 				return wireCancellationToken(token, this._provideDocumentRangeFormattingEdits(model.uri, range, options));
 			}
 		}, true);
 
 		modes.SuggestRegistry.register(this.getId(), {
 			triggerCharacters: [],
-			provideCompletionItems: (model, position, token): Thenable<modes.ISuggestResult[]> => {
+			provideCompletionItems: (model, position, token): Promise<modes.ISuggestResult[]> => {
 				return wireCancellationToken(token, this._provideCompletionItems(model.uri, position));
 			}
 		}, true);

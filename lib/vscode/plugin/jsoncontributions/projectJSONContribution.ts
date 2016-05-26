@@ -28,7 +28,7 @@ export class ProjectJSONContribution implements IJSONWorkerContribution {
     private requestService : IRequestService;
     private cachedProjects: { [id: string]: { version: string, description: string, time: number }} = {};
     private cacheSize: number = 0;
-    private nugetIndexPromise: Thenable<NugetServices>;
+    private nugetIndexPromise: Promise<NugetServices>;
 
     public constructor(requestService: IRequestService) {
         this.requestService = requestService;
@@ -69,7 +69,7 @@ export class ProjectJSONContribution implements IJSONWorkerContribution {
         }
     }
 
-    private getNugetIndex() : Thenable<NugetServices> {
+    private getNugetIndex() : Promise<NugetServices> {
         if (!this.nugetIndexPromise) {
             this.nugetIndexPromise = this.makeJSONRequest<any>(FEED_INDEX_URL).then(indexContent => {
                 let services : NugetServices = {};
@@ -89,7 +89,7 @@ export class ProjectJSONContribution implements IJSONWorkerContribution {
         return this.nugetIndexPromise;
     }
 
-    private getNugetService(serviceType: string) : Thenable<string> {
+    private getNugetService(serviceType: string) : Promise<string> {
         return this.getNugetIndex().then(services => {
             let serviceURL = services[serviceType];
             if (!serviceURL) {
@@ -99,7 +99,7 @@ export class ProjectJSONContribution implements IJSONWorkerContribution {
         });
     }
 
-    public collectDefaultSuggestions(resource: string, result: ISuggestionsCollector): Thenable<any> {
+    public collectDefaultSuggestions(resource: string, result: ISuggestionsCollector): Promise<any> {
         if (this.isProjectJSONFile(resource)) {
             let defaultValue = {
                 'version': '{{1.0.0-*}}',
@@ -114,7 +114,7 @@ export class ProjectJSONContribution implements IJSONWorkerContribution {
         return null;
     }
 
-    private makeJSONRequest<T>(url: string) : Thenable<T> {
+    private makeJSONRequest<T>(url: string) : Promise<T> {
         return this.requestService({
             url : url
         }).then(success => {
@@ -131,7 +131,7 @@ export class ProjectJSONContribution implements IJSONWorkerContribution {
         });
     }
 
-    public collectPropertySuggestions(resource: string, location: JSONLocation, currentWord: string, addValue: boolean, isLast:boolean, result: ISuggestionsCollector) : Thenable<any> {
+    public collectPropertySuggestions(resource: string, location: JSONLocation, currentWord: string, addValue: boolean, isLast:boolean, result: ISuggestionsCollector) : Promise<any> {
         if (this.isProjectJSONFile(resource) && (location.matches(['dependencies']) || location.matches(['frameworks', '*', 'dependencies']) || location.matches(['frameworks', '*', 'frameworkAssemblies']))) {
 
             return this.getNugetService('SearchAutocompleteService').then(service => {
@@ -173,7 +173,7 @@ export class ProjectJSONContribution implements IJSONWorkerContribution {
         return null;
     }
 
-    public collectValueSuggestions(resource: string, location: JSONLocation, currentKey: string, result: ISuggestionsCollector): Thenable<any> {
+    public collectValueSuggestions(resource: string, location: JSONLocation, currentKey: string, result: ISuggestionsCollector): Promise<any> {
         if (this.isProjectJSONFile(resource) && (location.matches(['dependencies']) || location.matches(['frameworks', '*', 'dependencies']) || location.matches(['frameworks', '*', 'frameworkAssemblies']))) {
             return this.getNugetService('PackageBaseAddress/3.0.0').then(service => {
                 let queryUrl = service + currentKey + '/index.json';
@@ -201,7 +201,7 @@ export class ProjectJSONContribution implements IJSONWorkerContribution {
         return null;
     }
 
-    public getInfoContribution(resource: string, location: JSONLocation): Thenable<MarkedString[]> {
+    public getInfoContribution(resource: string, location: JSONLocation): Promise<MarkedString[]> {
         if (this.isProjectJSONFile(resource) && (location.matches(['dependencies', '*']) || location.matches(['frameworks', '*', 'dependencies', '*']) || location.matches(['frameworks', '*', 'frameworkAssemblies', '*']))) {
             let pack = location.getSegments()[location.getSegments().length - 1];
 
@@ -237,7 +237,7 @@ export class ProjectJSONContribution implements IJSONWorkerContribution {
         return null;
     }
 
-    public resolveSuggestion(item: CompletionItem) : Thenable<CompletionItem> {
+    public resolveSuggestion(item: CompletionItem) : Promise<CompletionItem> {
         if (item.data && Strings.startsWith(item.data, RESOLVE_ID)) {
             let pack = item.data.substring(RESOLVE_ID.length);
             if (this.completeWithCache(pack, item)) {

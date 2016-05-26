@@ -30,11 +30,11 @@ export class FileAssociationContribution implements IJSONWorkerContribution {
 		return Strings.endsWith(resource, '/settings.json');
 	}
 
-	public collectDefaultSuggestions(resource: string, result: ISuggestionsCollector): Thenable<any> {
+	public collectDefaultSuggestions(resource: string, result: ISuggestionsCollector): Promise<any> {
 		return null;
 	}
 
-	public collectPropertySuggestions(resource: string, location: JSONLocation, currentWord: string, addValue: boolean, isLast: boolean, result: ISuggestionsCollector): Thenable<any> {
+	public collectPropertySuggestions(resource: string, location: JSONLocation, currentWord: string, addValue: boolean, isLast: boolean, result: ISuggestionsCollector): Promise<any> {
 		if (this.isSettingsFile(resource) && location.matches(['files.associations'])) {
 			globProperties.forEach((e) => result.add(e));
 		}
@@ -42,7 +42,7 @@ export class FileAssociationContribution implements IJSONWorkerContribution {
 		return null;
 	}
 
-	public collectValueSuggestions(resource: string, location: JSONLocation, currentKey: string, result: ISuggestionsCollector): Thenable<any> {
+	public collectValueSuggestions(resource: string, location: JSONLocation, currentKey: string, result: ISuggestionsCollector): Promise<any> {
 		if (this.isSettingsFile(resource) && location.matches(['files.associations'])) {
 			this.languageIds.forEach(l => {
 				result.add({
@@ -56,7 +56,7 @@ export class FileAssociationContribution implements IJSONWorkerContribution {
 		return null;
 	}
 
-	public getInfoContribution(resource: string, location: JSONLocation): Thenable<MarkedString[]> {
+	public getInfoContribution(resource: string, location: JSONLocation): Promise<MarkedString[]> {
 		return null;
 	}
 }
