@@ -1,0 +1,20 @@
+{
+  "name": "omnisharp-atom",
+  "dependencies": {
+    "lodash": "github:david-driscoll/lodash-ts",
+    "semver": "registry:npm/semver#5.0.0+20160211003958"
+  },
+  "globalDependencies": {
+    "assertion-error": "registry:dt/assertion-error#1.0.0+20160316155526",
+    "jquery": "registry:dt/jquery#1.10.0+20160417213236",
+    "mixto": "registry:dt/mixto#0.0.0+20160317120654",
+    "node": "registry:env/node#4.0.0+20160507210304",
+    "q": "registry:dt/q#0.0.0+20160417152954"
+  },
+  "devDependencies": {
+    "chai": "registry:npm/chai#3.5.0+20160415060238"
+  },
+  "globalDevDependencies": {
+    "mocha": "registry:env/mocha#2.2.5+20160321223601"
+  }
+}

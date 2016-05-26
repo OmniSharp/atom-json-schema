@@ -1,4 +1,4 @@
-// Type definitions for event-kit (v1.1.0)
+// Type definitions for event-kit (v2.0.0)
 // Project: https://github.com/atom/event-kit
 // Definitions by: david-driscoll <https://github.com/david-driscoll/>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
@@ -24,12 +24,11 @@ declare module EventKit {
         dispose() : void;
     
         /**
-         * Add a disposable to be disposed when the composite is disposed.
+         * Add disposables to be disposed when the composite is disposed.
          * 
          * If this object has already been disposed, this method has no effect.
-         * @param disposable? - {Disposable} instance or any object with a `.dispose()` method. 
          */
-        add(disposable? : Disposable) : void;
+        add() : void;
     
         /**
          * Remove a previously added disposable.
@@ -51,10 +50,17 @@ declare module EventKit {
      */
     export class Disposable {
         /**
-         * Construct a Disposable
-         * @param disposalAction? - An action to perform when {::dispose} is called for the first time. 
+         * Ensure that `object` correctly implements the `Disposable`
+         * contract.
+         * @param object? - An {Object} you want to perform the check against.
          */
-        constructor(disposalAction? : any);
+        static isDisposable(object? : boolean) : Disposable;
+    
+        /**
+         * Construct a Disposable
+         * @param disposalAction? - A {Function} to call when {::dispose} is called for the first time. 
+         */
+        constructor(disposalAction? : Function);
     
         /**
          * Perform the disposal action, indicating that the resource associated
@@ -75,6 +81,21 @@ declare module EventKit {
      */
     export class Emitter {
         /**
+         * This field or method was not documented by atomdoc, assume it is private. Use with caution.
+         */
+        static onEventHandlerException(exceptionHandler? : (...value: any[]) => void) : any;
+    
+        /**
+         * This field or method was not documented by atomdoc, assume it is private. Use with caution.
+         */
+        static simpleDispatch(handler? : (...value: any[]) => void, value? : any) : TextBuffer.Patch;
+    
+        /**
+         * This field or method was not documented by atomdoc, assume it is private. Use with caution.
+         */
+        static exceptionHandlingDispatch(handler? : (...value: any[]) => void, value? : any) : TextBuffer.Patch;
+    
+        /**
          * Construct an emitter.
          * 
          * ```coffee
@@ -82,6 +103,11 @@ declare module EventKit {
          * ```
          */
         constructor();
+    
+        /**
+         * Clear out any existing subscribers. 
+         */
+        clear() : void;
     
         /**
          * Unsubscribe all handlers. 

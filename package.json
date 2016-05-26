@@ -17,8 +17,13 @@
     "bluebird": "^2.9.27",
     "del": "^1.2.0",
     "fuzzaldrin": "^2.1.0",
-    "gulp": "^3.9.0",
-    "gulp-util": "^3.0.5",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-sourcemap": "^1.0.1",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-tslint": "^5.0.0",
+    "gulp-typescript": "^2.13.4",
+    "gulp-util": "^3.0.7",
     "is-my-json-valid": "^2.12.0",
     "jquery": "^2.1.4",
     "lodash": "^3.10.0",
@@ -29,10 +34,13 @@
     "node-fetch": "^1.3.1",
     "react": "^0.13.3",
     "rx": "^2.5.3",
+    "rxjs": "^5.0.0-beta.8",
     "semver": "^5.0.0",
     "through2": "^2.0.0",
     "tsd": "~0.6.1",
-    "typescript": "^1.5.0-beta"
+    "tslint": "^3.10.2",
+    "typescript": "^1.8.10",
+    "typings": "^1.0.4"
   },
   "consumedServices": {
     "status-bar": {

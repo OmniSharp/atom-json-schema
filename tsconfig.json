@@ -1,46 +1,43 @@
 {
-    "version": "1.4.1",
-    "compilerOptions": {
-        "target": "es5",
-        "module": "commonjs",
-        "declaration": false,
-        "noImplicitAny": false,
-        "removeComments": true,
-        "noLib": false
-    },
-    "formatCodeOptions": {
-        "indentSize": 4,
-        "tabSize": 4,
-        "newLineCharacter": "\r\n",
-        "convertTabsToSpaces": true,
-        "insertSpaceAfterCommaDelimiter": true,
-        "insertSpaceAfterSemicolonInForStatements": true,
-        "insertSpaceBeforeAndAfterBinaryOperators": true,
-        "insertSpaceAfterKeywordsInControlFlowStatements": true,
-        "insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
-        "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
-        "placeOpenBraceOnNewLineForFunctions": false,
-        "placeOpenBraceOnNewLineForControlBlocks": false
-    },
-    "compileOnSave": true,
-    "filesGlob": [
-        "./**/*.ts",
-        "!./typings/**/*.d.ts",
-        "!./typingsTemp/**/*.d.ts",
-        "!./node_modules/**/*.ts"
-    ],
-    "files": [
-        "./es6.d.ts",
-        "./lib/helpers/get-ranges.ts",
-        "./lib/json-schema.ts",
-        "./lib/omni.ts",
-        "./lib/providers/bower-provider.ts",
-        "./lib/providers/npm-provider.ts",
-        "./lib/schema-autocomplete.ts",
-        "./lib/schema-linter.ts",
-        "./lib/schema-provider.ts",
-        "./lib/schema-selector-view.ts",
-        "./lib/schema-selector.ts",
-        "./tsd.d.ts"
-    ]
+  "externalTranspiler": {
+    "name": "babel",
+    "options": {}
+  },
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+    "moduleResolution": "node",
+    "declaration": false,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "noLib": false,
+    "preserveConstEnums": true,
+    "experimentalDecorators": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true
+  },
+  "compileOnSave": true,
+  "formatCodeOptions": {
+    "indentSize": 4,
+    "tabSize": 4,
+    "indentStyle": "smart",
+    "convertTabsToSpaces": true,
+    "insertSpaceAfterCommaDelimiter": true,
+    "insertSpaceAfterSemicolonInForStatements": true,
+    "insertSpaceBeforeAndAfterBinaryOperators": true,
+    "insertSpaceAfterKeywordsInControlFlowStatements": true,
+    "insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+    "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+    "placeOpenBraceOnNewLineForFunctions": false,
+    "placeOpenBraceOnNewLineForControlBlocks": false
+  },
+  "exclude": [
+    "node_modules",
+    "typingsTemp",
+    "typings"
+  ],
+  "atom": {
+    "rewriteTsconfig": true
+  }
 }
