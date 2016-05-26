@@ -4,14 +4,14 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import URI from 'vs/base/common/uri';
-import Parser = require('./parser/jsonParser');
-import SchemaService = require('./jsonSchemaService');
-import Types = require('vs/base/common/types');
-import JsonWorker = require('./jsonWorker');
-import JsonSchema = require('vs/base/common/jsonSchema');
-import nls = require('vs/nls');
-import errors = require('vs/base/common/errors');
+import URI from './common/uri';
+import Parser from './parser/jsonParser';
+import SchemaService from './jsonSchemaService';
+import Types from 'vs/base/common/types';
+import JsonWorker from './jsonWorker';
+import JsonSchema from 'vs/base/common/jsonSchema';
+import nls from 'vs/nls';
+import errors from 'vs/base/common/errors';
 import {IRequestService} from 'vs/platform/request/common/request';
 
 export class JSONIntellisense {

@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import Json = require('jsonc-parser');
+import Json from 'jsonc-parser';
 import {ITextDocument, Range, Position, FormattingOptions, TextEdit} from 'vscode-languageserver';
 
 export function format(document: ITextDocument, range: Range, options: FormattingOptions): TextEdit[] {
@@ -83,7 +83,7 @@ export function format(document: ITextDocument, range: Range, options: Formattin
 			replaceContent = secondToken === Json.SyntaxKind.LineCommentTrivia ? newLineAndIndent() : '';
 			secondToken = scanNext();
 		}
-		
+
 		if (secondToken === Json.SyntaxKind.CloseBraceToken) {
 			if (firstToken !== Json.SyntaxKind.OpenBraceToken) {
 				indentLevel--;

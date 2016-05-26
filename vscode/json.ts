@@ -4,12 +4,12 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-/*import editorCommon = require('vs/editor/common/editorCommon');
-import modes = require('vs/editor/common/modes');
+/*import editorCommon from 'vs/editor/common/editorCommon';
+import modes from 'vs/editor/common/modes';
 import URI from 'vs/base/common/uri';
-import Platform = require('vs/platform/platform');
-import jsonWorker = require('vs/languages/json/common/jsonWorker');
-import tokenization = require('vs/languages/json/common/features/tokenization');
+import Platform from 'vs/platform/platform';
+import jsonWorker from 'vs/languages/json/common/jsonWorker';
+import tokenization from 'vs/languages/json/common/features/tokenization';
 import {AbstractMode, createWordRegExp, ModeWorkerManager} from 'vs/editor/common/modes/abstractMode';
 import {OneWorkerAttr, AllWorkersAttr} from 'vs/platform/thread/common/threadService';
 import {IThreadService, ThreadAffinity} from 'vs/platform/thread/common/thread';

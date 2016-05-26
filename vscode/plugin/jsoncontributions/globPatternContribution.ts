@@ -5,7 +5,7 @@
 'use strict';
 
 import {MarkedString, CompletionItemKind, CompletionItem} from 'vscode-languageserver';
-import Strings = require('../utils/strings');
+import Strings from '../utils/strings';
 import {IJSONWorkerContribution, ISuggestionsCollector} from '../jsonContributions';
 import {JSONLocation} from '../jsonLocation';
 

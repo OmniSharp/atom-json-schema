@@ -4,13 +4,13 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import assert = require('assert');
-import SchemaService = require('../jsonSchemaService');
-import JsonSchema = require('../jsonSchema');
-import Json = require('jsonc-parser');
-import Parser = require('../jsonParser');
-import fs = require('fs');
-import path = require('path');
+import assert from 'assert';
+import SchemaService from '../jsonSchemaService';
+import JsonSchema from '../jsonSchema';
+import Json from 'jsonc-parser';
+import Parser from '../jsonParser';
+import fs from 'fs';
+import path from 'path';
 import {XHROptions, XHRResponse} from 'request-light';
 
 
@@ -73,7 +73,7 @@ suite('JSON Schema', () => {
 		});
 
 	});
-	
+
 	test('Resolving $refs 2', function(testDone) {
 		var service = new SchemaService.JSONSchemaService(requestServiceMock);
 		service.setSchemaContributions({ schemas: {

@@ -14,10 +14,10 @@ import {
 } from 'vscode-languageserver';
 
 import {xhr, XHROptions, XHRResponse, configure as configureHttpRequests} from 'request-light';
-import path = require('path');
-import fs = require('fs');
+import path from 'path';
+import fs from 'fs';
 import URI from './utils/uri';
-import Strings = require('./utils/strings');
+import Strings from './utils/strings';
 import {JSONSchemaService, ISchemaAssociations} from './jsonSchemaService';
 import {parse as parseJSON, ObjectASTNode, JSONDocument} from './jsonParser';
 import {JSONCompletion} from './jsonCompletion';

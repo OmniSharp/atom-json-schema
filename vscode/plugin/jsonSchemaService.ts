@@ -4,12 +4,12 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import Json = require('jsonc-parser');
+import Json from 'jsonc-parser';
 import {IJSONSchema, IJSONSchemaMap} from './jsonSchema';
 import {XHROptions, XHRResponse, getErrorStatusDescription} from 'request-light';
 import URI from './utils/uri';
-import Strings = require('./utils/strings');
-import Parser = require('./jsonParser');
+import Strings from './utils/strings';
+import Parser from './jsonParser';
 
 import * as nls from 'vscode-nls';
 const localize = nls.loadMessageBundle();

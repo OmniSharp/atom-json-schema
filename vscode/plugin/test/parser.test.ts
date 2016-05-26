@@ -4,10 +4,10 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import assert = require('assert');
-import Parser = require('../jsonParser');
-import SchemaService = require('../jsonSchemaService');
-import JsonSchema = require('../jsonSchema');
+import assert from 'assert';
+import Parser from '../jsonParser';
+import SchemaService from '../jsonSchemaService';
+import JsonSchema from '../jsonSchema';
 
 suite('JSON Parser', () => {
 

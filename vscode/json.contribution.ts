@@ -4,8 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-//import ConfigurationRegistry = require('vs/platform/configuration/common/configurationRegistry');
-//import Platform = require('vs/platform/platform');
+//import ConfigurationRegistry from 'vs/platform/configuration/common/configurationRegistry';
+//import Platform from 'vs/platform/platform';
 //import {ModesRegistry} from 'vs/editor/common/modes/modesRegistry';
 
 /*

@@ -4,10 +4,10 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import Json = require('jsonc-parser');
+import Json from 'jsonc-parser';
 import {ITextDocument, DocumentFormattingParams, Range, Position, FormattingOptions, TextEdit} from 'vscode-languageserver';
-import Formatter = require('../jsonFormatter');
-import assert = require('assert');
+import Formatter from '../jsonFormatter';
+import assert from 'assert';
 import {applyEdits} from './textEditSupport';
 
 suite('JSON Formatter', () => {
@@ -308,7 +308,7 @@ suite('JSON Formatter', () => {
 
 		format(content, expected);
 	});
-	
+
 	test('multiple mixed comments on same line', () => {
 		var content = [
 			'[ /*comment*/  /*comment*/   // comment ',

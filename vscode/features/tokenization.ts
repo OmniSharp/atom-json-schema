@@ -4,9 +4,9 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import json = require('vs/base/common/json');
-import Modes = require('vs/editor/common/modes');
-import jsonTokenTypes = require('vs/languages/json/common/features/jsonTokenTypes');
+import json from 'vs/base/common/json';
+import Modes from 'vs/editor/common/modes';
+import jsonTokenTypes from 'vs/languages/json/common/features/jsonTokenTypes';
 
 export function createTokenizationSupport(mode:Modes.IMode, supportComments:boolean):Modes.ITokenizationSupport {
 	return {

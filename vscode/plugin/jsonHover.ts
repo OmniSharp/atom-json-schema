@@ -5,8 +5,8 @@
 'use strict';
 
 
-import Parser = require('./jsonParser');
-import SchemaService = require('./jsonSchemaService');
+import Parser from './jsonParser';
+import SchemaService from './jsonSchemaService';
 import {IJSONWorkerContribution} from './jsonContributions';
 
 import {Hover, ITextDocument, TextDocumentPosition, Range, MarkedString} from 'vscode-languageserver';
@@ -39,7 +39,7 @@ export class JSONHover {
 		if (!node) {
 			return Promise.resolve(void 0);
 		}
-		
+
 		var createHover = (contents: MarkedString[]) => {
 			let range = Range.create(document.positionAt(node.start), document.positionAt(node.end));
 			let result: Hover = {
@@ -47,8 +47,8 @@ export class JSONHover {
 				range: range
 			};
 			return result;
-		};	
-		
+		};
+
 		let location = node.getNodeLocation();
 		for (let i = this.contributions.length - 1; i >= 0; i--) {
 			let contribution = this.contributions[i];

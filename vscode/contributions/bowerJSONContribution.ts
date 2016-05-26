@@ -4,12 +4,12 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import HtmlContent = require('vs/base/common/htmlContent');
-import Strings = require('vs/base/common/strings');
-import nls = require('vs/nls');
-import JSONWorker = require('vs/languages/json/common/jsonWorker');
+import HtmlContent from 'vs/base/common/htmlContent';
+import Strings from 'vs/base/common/strings';
+import nls from 'vs/nls';
+import JSONWorker from 'vs/languages/json/common/jsonWorker';
 import {IRequestService} from 'vs/platform/request/common/request';
-import URI from 'vs/base/common/uri';
+import URI from '../common/uri';
 import {JSONLocation} from 'vs/languages/json/common/parser/jsonLocation';
 
 export class BowerJSONContribution implements JSONWorker.IJSONWorkerContribution {

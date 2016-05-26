@@ -1,7 +1,7 @@
 import {Observable} from "rxjs";
 import {CompositeDisposable, Disposable} from "./disposables";
 import {SelectorComponent} from './schema-selector-view';
-import React = require('react');
+import React from 'react';
 import {omni} from "./omni";
 import {schemaProvider, ISchema} from "./schema-provider";
 import {isEmpty} from "lodash";

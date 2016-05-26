@@ -4,8 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import Json = require('jsonc-parser');
-import JsonSchema = require('./jsonSchema');
+import Json from 'jsonc-parser';
+import JsonSchema from './jsonSchema';
 import {JSONLocation} from './jsonLocation';
 
 import * as nls from 'vscode-nls';

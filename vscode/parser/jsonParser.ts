@@ -4,11 +4,11 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import nls = require('vs/nls');
-import Arrays = require('vs/base/common/arrays');
-import Types = require('vs/base/common/types');
-import Json = require('vs/base/common/json');
-import JsonSchema = require('vs/base/common/jsonSchema');
+import nls from 'vs/nls';
+import Arrays from 'vs/base/common/arrays';
+import Types from 'vs/base/common/types';
+import Json from 'vs/base/common/json';
+import JsonSchema from 'vs/base/common/jsonSchema';
 import {JSONLocation} from './jsonLocation';
 
 export interface IRange {

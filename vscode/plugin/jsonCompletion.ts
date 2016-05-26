@@ -5,9 +5,9 @@
 'use strict';
 
 
-import Parser = require('./jsonParser');
-import SchemaService = require('./jsonSchemaService');
-import JsonSchema = require('./jsonSchema');
+import Parser from './jsonParser';
+import SchemaService from './jsonSchemaService';
+import JsonSchema from './jsonSchema';
 import {IJSONWorkerContribution} from './jsonContributions';
 
 import {CompletionItem, CompletionItemKind, CompletionList, ITextDocument, TextDocumentPosition, Range, TextEdit, RemoteConsole} from 'vscode-languageserver';

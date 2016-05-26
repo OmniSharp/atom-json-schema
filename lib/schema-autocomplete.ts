@@ -127,7 +127,7 @@ function getSuggestions(options: RequestOptions): Promise<Suggestion[]> {
         options.bufferPosition.row === line && options.bufferPosition.column === column + 1);
 
     var {ranges, objectPaths} = getRanges(options.editor);
-    var existingKeys = _(ranges).keys()
+    var existingKeys = _(_.keys(ranges))
         .filter(z => _.startsWith(z + '/', context.path))
         .filter(z => z && z.indexOf('/') === -1)
         .value();
@@ -140,7 +140,7 @@ function getSuggestions(options: RequestOptions): Promise<Suggestion[]> {
             var p = (context.path || '').split('/');
             var rootSchema = schema;
 
-            var parentSchema;
+            var parentSchema: any;
             while (p.length) {
                 let lastSchema = schema;
                 let s = p.shift();
@@ -164,7 +164,7 @@ function getSuggestions(options: RequestOptions): Promise<Suggestion[]> {
             }
 
             var objectPath = _.find(objectPaths, (value, key) => key === context.path);
-            if (objectPath && _.isArray(schema.type) && _.contains(schema.type, "object") && (options.bufferPosition.row == objectPath.line && options.bufferPosition.column + 1 > objectPath.column || options.bufferPosition.row > objectPath.line)) {
+            if (objectPath && _.isArray(schema.type) && _.includes(schema.type, "object") && (options.bufferPosition.row == objectPath.line && options.bufferPosition.column + 1 > objectPath.column || options.bufferPosition.row > objectPath.line)) {
                 inferedType = "object";
             }
 
@@ -172,9 +172,9 @@ function getSuggestions(options: RequestOptions): Promise<Suggestion[]> {
                 return schema.enum.map(property => ({ key: property, type: 'enum', description: '' }));
             }
 
-            if (inferedType === "object" && schema.properties && _.any(schema.properties)) {
+            if (inferedType === "object" && schema.properties && _.some(schema.properties)) {
                 return _.keys(schema.properties)
-                    .filter(z => !_.contains(existingKeys, z))
+                    .filter(z => !_.includes(existingKeys, z))
                     .map(property => {
                         var propertySchema = schema.properties[property];
                         return { key: property, type: typeof propertySchema.type === "string" ? <string>propertySchema.type : 'property', description: propertySchema.description }
@@ -223,7 +223,7 @@ function getSuggestions(options: RequestOptions): Promise<Suggestion[]> {
     if (providers.length) {
         var workingOptions = <IAutocompleteProviderOptions>_.defaults({ prefix, replacementPrefix: prefix }, context, options);
         var workingProviders = _.filter(providers, z =>
-            _.contains(z.fileMatchs, options.editor.getBuffer().getBaseName()) && z.pathMatch(context.path))
+            _.includes(z.fileMatchs, options.editor.getBuffer().getBaseName()) && z.pathMatch(context.path))
             .map(z => z.getSuggestions(workingOptions).then(suggestions =>
                 _.each(suggestions, s => s.snippet = fixSnippet(s.snippet, { hasLeadingQuote, hasTrailingQuote }, 'other'))));
         if (workingProviders.length) {
@@ -242,7 +242,7 @@ export var CompletionProvider = {
     inclusionPriority: 2,
     excludeLowerPriority: false,
     getSuggestions,
-    registerProvider: (provider) => {
+    registerProvider: (provider: any) => {
         providers.push(provider);
     },
     onDidInsertSuggestion({editor, suggestion}: { editor: Atom.TextEditor; triggerPosition: any; suggestion: { text: string } }) {
