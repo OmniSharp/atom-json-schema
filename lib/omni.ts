@@ -1,9 +1,10 @@
 //omnipresent
-import _ = require('lodash');
-import {CompositeDisposable, ReplaySubject} from "rx";
+import _ from 'lodash';
+import {ReplaySubject} from "rxjs";
 import {ISchema} from "./schema-provider";
+import {CompositeDisposable, IDisposable} from "./disposables";
 
-class Omni implements Rx.IDisposable {
+class Omni implements IDisposable {
     private disposable = new CompositeDisposable();
     private _editor = new ReplaySubject<Atom.TextEditor>(1);
     private _editorObservable = this._editor.asObservable();

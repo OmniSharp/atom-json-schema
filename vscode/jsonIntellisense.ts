@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import Modes = require('vs/editor/common/modes');
 import URI from 'vs/base/common/uri';
 import Parser = require('./parser/jsonParser');
 import SchemaService = require('./jsonSchemaService');

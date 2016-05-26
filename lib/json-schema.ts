@@ -1,13 +1,14 @@
-import _ = require('lodash');
-import {CompositeDisposable, ReplaySubject} from "rx";
+import _ from 'lodash';
+import {Observable, ReplaySubject} from "rxjs";
+import {CompositeDisposable} from "./disposables";
 import {omni} from "./omni";
 
 class JsonSchema {
     private disposable = new CompositeDisposable();
 
-    public editor: Rx.Observable<Atom.TextEditor>;
+    public editor: Observable<Atom.TextEditor>;
 
-    public activate(state) {
+    public activate(state: any) {
         omni.activate();
         this.disposable.add(omni);
 
@@ -25,12 +26,12 @@ class JsonSchema {
         this.disposable.dispose();
     }
 
-    public consumeStatusBar(statusBar) {
+    public consumeStatusBar(statusBar: any) {
         var {schemaSelector} = require('./schema-selector');
         schemaSelector.setup(statusBar);
     }
 
-    public consumeProvider(providers) {
+    public consumeProvider(providers: any) {
         if (!providers) return;
         if (!_.isArray(providers)) providers = [providers];
         var cd = new CompositeDisposable();
@@ -45,11 +46,10 @@ class JsonSchema {
         return CompletionProvider;
     }
 
-    public provideLinter(linter) {
+    public provideLinter(linter: any) {
         var LinterProvider = require("./schema-linter");
         return LinterProvider.provider;
     }
 }
 
-var instance = new JsonSchema;
-export = instance;
+module.exports = new JsonSchema;

@@ -1,6 +1,6 @@
 import * as _ from "lodash";
-var fetch: (url: string) => Rx.IPromise<IResult> = require('node-fetch');
-import {Observable} from "rx";
+var fetch: (url: string) => Promise<IResult> = require('node-fetch');
+import {Observable} from "rxjs";
 
 interface IResult {
     json<T>(): T;
@@ -23,7 +23,7 @@ export interface ISchema {
     description: string;
     fileMatch?: string[];
     url: string;
-    content: Rx.Observable<ISchemaInstance>;
+    content: Observable<ISchemaInstance>;
 }
 
 export interface ISchemaInstance {
@@ -50,7 +50,7 @@ class Schema implements ISchema {
         this.url = header.url;
     }
 
-    private _content: Rx.Observable<ISchemaInstance>;
+    private _content: Observable<ISchemaInstance>;
     public get content() {
         if (!this._content)
             this._content = Observable.fromPromise<ISchemaInstance>(fetch(this.url).then(res => res.json<ISchemaInstance>())).shareReplay(1);
@@ -60,7 +60,7 @@ class Schema implements ISchema {
 
 class SchemaProvider {
     private _schemas = new Map<string, ISchema>();
-    private _schemasObservable: Rx.Observable<ISchema[]>;
+    private _schemasObservable: Observable<ISchema[]>;
 
     public constructor() {
         this._schemas.set('JSON', {

@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import editorCommon = require('vs/editor/common/editorCommon');
+/*import editorCommon = require('vs/editor/common/editorCommon');
 import modes = require('vs/editor/common/modes');
 import URI from 'vs/base/common/uri';
 import Platform = require('vs/platform/platform');
@@ -45,7 +45,7 @@ export class JSONMode extends AbstractMode {
 
 			comments: {
 				lineComment: '//',
-				blockComment: ['/*', '*/']
+				blockComment: ['/*', '/']
 			},
 
 			brackets: [
@@ -175,3 +175,4 @@ export class JSONMode extends AbstractMode {
 		return this._worker((w) => w.format(resource, range, options));
 	}
 }
+*/

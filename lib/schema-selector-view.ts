@@ -1,11 +1,12 @@
 import {SelectListView, $$} from 'atom-space-pen-views';
 
-import {CompositeDisposable, Disposable, Scheduler, Observable} from "rx";
-import _ = require('lodash');
+import {Scheduler, Observable} from "rxjs";
+import {CompositeDisposable, Disposable} from "./disposables";
+import _ from 'lodash';
 import React = require('react');
 import {omni} from "./omni";
 import {schemaProvider, ISchema} from "./schema-provider";
-import $ = require('jquery');
+import $ from 'jquery';
 
 interface SelectorState {
     schemas?: ISchema[];

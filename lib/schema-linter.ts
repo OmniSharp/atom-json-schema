@@ -9,9 +9,10 @@ var validator: (schema) => validatorResult;
 })();
 
 var Range = require('atom').Range;
-import _ = require('lodash');
+import _ from 'lodash';
 import {omni} from "./omni";
-import {Observable, CompositeDisposable} from "rx";
+import {Observable} from "rxjs";
+import {CompositeDisposable} from "./disposables";
 import {schemaProvider} from "./schema-provider";
 import {getRanges, ITokenRange} from "./helpers/get-ranges";
 

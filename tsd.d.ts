@@ -1,9 +1,10 @@
-/// <reference path="typings/bluebird/bluebird.d.ts" />
-/// <reference path="typings/jquery/jquery.d.ts" />
-/// <reference path="typings/lodash/lodash.d.ts" />
-/// <reference path="typings/node/node.d.ts" />
-/// <reference path="typings/semver/semver.d.ts" />
-/// <reference path="typings/react/react.d.ts" />
+/// <reference path="typings/globals/Q/index.d.ts" />
+/// <reference path="typings/globals/assertion-error/index.d.ts" />
+/// <reference path="typings/globals/jquery/index.d.ts" />
+/// <reference path="typings/globals/mixto/index.d.ts" />
+/// <reference path="typings/globals/node/index.d.ts" />
+/// <reference path="typings/modules/semver/index.d.ts" />
+/// <reference path="typings/modules/lodash/index.d.ts" />
 /// <reference path="typingsTemp/atom/atom.d.ts" />
 /// <reference path="typingsTemp/atom-keymap/atom-keymap.d.ts" />
 /// <reference path="typingsTemp/atom-space-pen-views/atom-space-pen-views.d.ts" />
@@ -18,8 +19,6 @@
 /// <reference path="typingsTemp/space-pen/space-pen.d.ts" />
 /// <reference path="typingsTemp/status-bar/status-bar.d.ts" />
 /// <reference path="typingsTemp/text-buffer/text-buffer.d.ts" />
-/// <reference path="node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="es6.d.ts" />
 
 interface IAutocompleteProviderOptions {
     editor: Atom.TextEditor;
@@ -34,7 +33,7 @@ interface IAutocompleteProviderOptions {
 interface IAutocompleteProvider {
     fileMatchs: string[];
     pathMatch: (path: string) => boolean;
-    getSuggestions: (options: IAutocompleteProviderOptions) => Rx.IPromise<Suggestion[]>;
+    getSuggestions: (options: IAutocompleteProviderOptions) => Promise<Suggestion[]>;
     dispose(): void;
 }
 

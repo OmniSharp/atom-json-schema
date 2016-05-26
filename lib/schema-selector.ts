@@ -1,4 +1,5 @@
-import {CompositeDisposable, Observable, Disposable} from "rx";
+import {Observable} from "rxjs";
+import {CompositeDisposable, Disposable} from "./disposables";
 import {SelectorComponent} from './schema-selector-view';
 import React = require('react');
 import {omni} from "./omni";
@@ -6,7 +7,7 @@ import {schemaProvider, ISchema} from "./schema-provider";
 import {isEmpty} from "lodash";
 
 class SchemaSelector {
-    private disposable: Rx.CompositeDisposable;
+    private disposable: CompositeDisposable;
     private view: HTMLSpanElement;
     private tile: any;
     private statusBar: any;

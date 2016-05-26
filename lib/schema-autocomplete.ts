@@ -1,6 +1,6 @@
-import _ = require('lodash')
-import {Subject, BehaviorSubject, Observable, CompositeDisposable} from 'rx';
-import Promise = require('bluebird');
+import _ from 'lodash';
+import {Subject, BehaviorSubject, Observable} from 'rxjs';
+import {CompositeDisposable} from './disposables';
 //var escape = require("escape-html");
 var filter = require('fuzzaldrin').filter;
 import {getPath, getRanges, ITokenRange} from "./helpers/get-ranges";
@@ -61,7 +61,7 @@ function renderReturnType(returnType: string) {
 
 function schemaGet(schema: ISchemaInstance, path: string) {
     // ignore .data
-    var p = (path  || '').split('/');
+    var p = (path || '').split('/');
     var rootSchema = schema;
     while (p.length) {
         let s = p.shift();
@@ -79,7 +79,7 @@ function schemaGet(schema: ISchemaInstance, path: string) {
     return schema;
 }
 
-function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
+function getSuggestions(options: RequestOptions): Promise<Suggestion[]> {
     /*var buffer = options.editor.getBuffer();
     var end = options.bufferPosition.column;
     var data = buffer.getLines()[options.bufferPosition.row].substring(0, end + 1);
@@ -118,7 +118,7 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
     try {
         let cursor = options.editor.getLastCursor();
         let editor = options.editor;
-        prefix = <any> editor.getTextInBufferRange(cursor.getCurrentWordBufferRange({ wordRegex: /^[\t ]*$|[^\s\/\\\(\)"':,\;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?]+|[\/\\\(\)"':,\;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?]+/ }));
+        prefix = <any>editor.getTextInBufferRange(cursor.getCurrentWordBufferRange({ wordRegex: /^[\t ]*$|[^\s\/\\\(\)"':,\;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?]+|[\/\\\(\)"':,\;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?]+/ }));
     } catch (e) { }
 
     prefix = _.trim(prefix, ':{}," ');
@@ -177,7 +177,7 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
                     .filter(z => !_.contains(existingKeys, z))
                     .map(property => {
                         var propertySchema = schema.properties[property];
-                        return { key: property, type: typeof propertySchema.type === "string" ? <string> propertySchema.type : 'property', description: propertySchema.description }
+                        return { key: property, type: typeof propertySchema.type === "string" ? <string>propertySchema.type : 'property', description: propertySchema.description }
                     });
             }
 

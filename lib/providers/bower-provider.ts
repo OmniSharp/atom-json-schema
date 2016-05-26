@@ -1,6 +1,6 @@
-import * as _ from "lodash";
-import {Observable} from "rx";
-var fetch: (url: string) => Rx.IPromise<IResult> = require('node-fetch');
+import _ from 'lodash';
+import {Observable} from "rxjs";
+var fetch: (url: string) => Promise<IResult> = require('node-fetch');
 
 interface IResult {
     json<T>(): T;
