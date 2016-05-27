@@ -19,61 +19,6 @@ interface LinterError {
     col?: number;
 }
 
-interface validatorResult {
-    (data: any, options: any): void;
-    errors: validatorError[];
-}
-
-interface validatorError {
-    field: string;
-    message: string;
-    value: any;
-}
-
-function getWordAt(str: string, pos: number) {
-    var wordLocation = {
-        start: pos,
-        end: pos
-    }
-
-    if (str === undefined) {
-        return wordLocation;
-    }
-
-    while (pos < str.length && /\W/.test(str[pos])) {
-        ++pos;
-    }
-
-    var left = str.slice(0, pos + 1).search(/\W(?!.*\W)/);
-    var right = str.slice(pos).search(/(\W|$)/);
-
-    wordLocation.start = left + 1;
-    wordLocation.end = wordLocation.start + right;
-
-    return wordLocation;
-}
-
-function mapValues(editor: Atom.TextEditor, ranges: { [key: string]: ITokenRange }, error: validatorError): LinterError {
-    var range = ranges[error.field.replace('data.', '')];
-    if (!range) {
-        // TODO:  Should try and figure out some of these failures
-        return null;
-    }
-    var line = range.section.start[0];
-    var column = range.section.start[1];
-    var text = editor.lineTextForBufferRow(line);
-    var level = 'error';
-
-    return {
-        type: level,
-        text: `${error.field} - ${error.message}`,
-        filePath: editor.getPath(),
-        line: line + 1,
-        col: column + 1,
-        range: new Range(range.value.start, range.value.end)
-    };
-}
-
 export var provider = [
     {
         grammarScopes: ['source.json'],

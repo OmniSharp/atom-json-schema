@@ -6,12 +6,12 @@
 
 import HtmlContent from '../common/htmlContent';
 import Strings from '../common/strings';
-import JSONWorker from '../jsonWorker';
+//import JSONWorker from '../jsonWorker';
 import URI from '../common/uri';
 import {JSONLocation} from '../parser/jsonLocation';
 import request from 'request-light';
 
-export class BowerJSONContribution implements JSONWorker.IJSONWorkerContribution {
+export class BowerJSONContribution /*implements JSONWorker.IJSONWorkerContribution*/ {
 
     private topRanked = ['twitter', 'bootstrap', 'angular-1.1.6', 'angular-latest', 'angulerjs', 'd3', 'myjquery', 'jq', 'abcdef1234567890', 'jQuery', 'jquery-1.11.1', 'jquery',
         'sushi-vanilla-x-data', 'font-awsome', 'Font-Awesome', 'font-awesome', 'fontawesome', 'html5-boilerplate', 'impress.js', 'homebrew',
@@ -76,11 +76,11 @@ export class BowerJSONContribution implements JSONWorker.IJSONWorkerContribution
                                 // ignore
                             }
                         } else {
-                            result.error(nls.localize('json.bower.error.repoaccess', 'Request to the bower repository failed: {0}', success.responseText));
+                            result.error(`Request to the bower repository failed: ${success.responseText}`);
                             return 0;
                         }
                     }, (error) => {
-                        result.error(nls.localize('json.bower.error.repoaccess', 'Request to the bower repository failed: {0}', error.responseText));
+                        result.error(`Request to the bower repository failed: ${error.responseText}`);
                         return 0;
                     });
             } else {

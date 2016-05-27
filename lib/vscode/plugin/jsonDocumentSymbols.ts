@@ -5,7 +5,9 @@
 'use strict';
 
 import Parser from './jsonParser';
-import Strings from './utils/strings';
+import {Point} from "atom";
+import TextBuffer from "text-buffer";
+const Range = TextBuffer.Range;
 
 export class JSONDocumentSymbols {
 
@@ -19,24 +21,6 @@ export class JSONDocumentSymbols {
             return Promise.resolve(null);
         }
 
-        // special handling for key bindings
-        let resourceString = document.getURI();
-        if ((resourceString === 'vscode://defaultsettings/keybindings.json') || Strings.endsWith(resourceString.toLowerCase(), '/user/keybindings.json')) {
-            if (root.type === 'array') {
-                let result: SymbolInformation[] = [];
-                (<Parser.ArrayASTNode>root).items.forEach((item) => {
-                    if (item.type === 'object') {
-                        let property = (<Parser.ObjectASTNode>item).getFirstProperty('key');
-                        if (property && property.value) {
-                            let location = Location.create(document.getURI(), new Range(item.start, item.end));
-                            result.push({ name: property.value.getValue(), kind: SymbolKind.Function, location: location });
-                        }
-                    }
-                });
-                return Promise.resolve(result);
-            }
-        }
-
         let collectOutlineEntries = (result: SymbolInformation[], node: Parser.ASTNode, containerName: string): SymbolInformation[] => {
             if (node.type === 'array') {
                 (<Parser.ArrayASTNode>node).items.forEach((node: Parser.ASTNode) => {
@@ -46,7 +30,7 @@ export class JSONDocumentSymbols {
                 let objectNode = <Parser.ObjectASTNode>node;
 
                 objectNode.properties.forEach((property: Parser.PropertyASTNode) => {
-                    let location = Location.create(document.getURI(), new Range(property.start, property.end));
+                    let location = { uri: document.getURI(), range: new Range(property.start, property.end) };
                     let valueNode = property.value;
                     if (valueNode) {
                         let childContainerName = containerName ? containerName + '.' + property.key.name : property.key.name;
@@ -84,18 +68,7 @@ export interface SymbolInformation {
     location: Location;
 }
 
-export interface IFormattingOptions {
-    tabSize:number;
-    insertSpaces:boolean;
-}
-
 export class Location {
-    uri: URI;
-    range: [number, number];
-}
-
-export interface Hover {
-    htmlContent: HtmlContent.IHTMLContentElement[];
-
-    range: [number, number];
+    uri: string;
+    range: TextBuffer.Range;
 }
