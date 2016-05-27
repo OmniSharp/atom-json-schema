@@ -3,7 +3,6 @@ import _ from 'lodash';
 import {omni} from "./omni";
 import {Observable} from "rxjs";
 import {CompositeDisposable} from "./disposables";
-import {getRanges, ITokenRange} from "./helpers/get-ranges";
 
 import {JSONSchemaService, ISchemaAssociations} from './vscode/plugin/jsonSchemaService';
 import {parse as parseJSON, ObjectASTNode, JSONDocument} from './vscode/plugin/jsonParser';
