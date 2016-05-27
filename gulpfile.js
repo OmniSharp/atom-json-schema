@@ -47,8 +47,8 @@ function tsTranspile() {
 
 gulp.task('typescript', ['clean'], function() {
     return tsProject.src()
-        .pipe(tslint())
-        .pipe(tslint.report('prose'))
+        //.pipe(tslint())
+        //.pipe(tslint.report('prose'))
         .pipe(sourcemaps.init())
         .pipe(ts(tsProject))
         .pipe(babel())

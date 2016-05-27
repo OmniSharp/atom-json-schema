@@ -113,7 +113,7 @@ export class BowerJSONContribution implements JSONWorker.IJSONWorkerContribution
 
             var queryUrl = 'https://bower.herokuapp.com/packages/' + encodeURIComponent(pack);
 
-            return this.requestService.makeRequest({
+            return request.xhr({
                 url: queryUrl
             }).then((success) => {
                 try {

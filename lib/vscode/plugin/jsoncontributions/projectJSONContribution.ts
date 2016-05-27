@@ -9,6 +9,7 @@ import {XHRResponse, getErrorStatusDescription} from 'request-light';
 import {IJSONWorkerContribution, ISuggestionsCollector} from '../jsonContributions';
 import {IRequestService} from '../jsonSchemaService';
 import {JSONLocation} from '../jsonLocation';
+import request from 'request-light';
 
 const FEED_INDEX_URL = 'https://api.nuget.org/v3/index.json';
 const LIMIT = 30;
@@ -25,20 +26,18 @@ interface NugetServices {
 
 export class ProjectJSONContribution implements IJSONWorkerContribution {
 
-    private requestService : IRequestService;
     private cachedProjects: { [id: string]: { version: string, description: string, time: number }} = {};
     private cacheSize: number = 0;
     private nugetIndexPromise: Promise<NugetServices>;
 
-    public constructor(requestService: IRequestService) {
-        this.requestService = requestService;
+    public constructor() {
     }
 
     private isProjectJSONFile(resource: string): boolean {
         return Strings.endsWith(resource, '/project.json');
     }
 
-    private completeWithCache(id: string, item: CompletionItem) : boolean {
+    private completeWithCache(id: string, item: Suggestion) : boolean {
         let entry = this.cachedProjects[id];
         if (entry) {
             if (new Date().getTime() - entry.time > CACHE_EXPIRY) {
@@ -46,9 +45,9 @@ export class ProjectJSONContribution implements IJSONWorkerContribution {
                 this.cacheSize--;
                 return false;
             }
-            item.detail = entry.version;
-            item.documentation = entry.description;
-            item.insertText = item.insertText.replace(/\{\{\}\}/, '{{' + entry.version + '}}');
+            //item.detail = entry.version;
+            item.description = entry.description;
+            item.text = item.text.replace(/\{\{\}\}/, '{{' + entry.version + '}}');
             return true;
         }
         return false;
@@ -109,13 +108,13 @@ export class ProjectJSONContribution implements IJSONWorkerContribution {
                     'dnxcore50': {}
                 }
             };
-            result.add({ kind: CompletionItemKind.Class, label: 'Default project.json', insertText: JSON.stringify(defaultValue, null, '\t'), documentation: '' });
+            result.add({ type: "class", displayText: 'Default project.json', text: JSON.stringify(defaultValue, null, '\t'), description: '' });
         }
         return null;
     }
 
     private makeJSONRequest<T>(url: string) : Promise<T> {
-        return this.requestService({
+        return request.xhr({
             url : url
         }).then(success => {
             if (success.status === 200) {
@@ -153,9 +152,9 @@ export class ProjectJSONContribution implements IJSONWorkerContribution {
                                     insertText += ',';
                                 }
                             }
-                            let item : CompletionItem = { kind: CompletionItemKind.Property, label: name, insertText: insertText };
+                            let item : Suggestion = { type: "property", displayText: name,text: insertText };
                             if (!this.completeWithCache(name, item)) {
-                                item.data = RESOLVE_ID + name;
+                                (<any>item).data = RESOLVE_ID + name;
                             }
                             result.add(item);
                         }
@@ -179,13 +178,13 @@ export class ProjectJSONContribution implements IJSONWorkerContribution {
                 let queryUrl = service + currentKey + '/index.json';
                 return this.makeJSONRequest<any>(queryUrl).then(obj => {
                     if (Array.isArray(obj.versions)) {
-                        let results = <any[]> obj.versions;
+                        let results = <Suggestion[]> obj.versions;
                         for (let i = 0; i < results.length; i++) {
                             let curr = results[i];
                             let name = JSON.stringify(curr);
                             let label = name;
                             let documentation = '';
-                            result.add({ kind: CompletionItemKind.Class, label: label, insertText: name, documentation: documentation });
+                            result.add({ type: "class", displayText: label, text: name, description: documentation });
                         }
                         if (results.length === LIMIT) {
                             result.setAsIncomplete();
@@ -237,9 +236,9 @@ export class ProjectJSONContribution implements IJSONWorkerContribution {
         return null;
     }
 
-    public resolveSuggestion(item: CompletionItem) : Promise<CompletionItem> {
-        if (item.data && Strings.startsWith(item.data, RESOLVE_ID)) {
-            let pack = item.data.substring(RESOLVE_ID.length);
+    public resolveSuggestion(item: Suggestion) : Promise<Suggestion> {
+        if ((<any>item).data && Strings.startsWith((<any>item).data, RESOLVE_ID)) {
+            let pack = (<any>item).data.substring(RESOLVE_ID.length);
             if (this.completeWithCache(pack, item)) {
                 return Promise.resolve(item);
             }

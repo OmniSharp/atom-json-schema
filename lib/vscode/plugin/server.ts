@@ -108,7 +108,7 @@ let request = (options: XHROptions): Promise<XHRResponse> => {
 };
 
 let contributions = [
-	new ProjectJSONContribution(request),
+	new ProjectJSONContribution(),
 	new GlobPatternContribution(),
 	filesAssociationContribution
 ];

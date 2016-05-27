@@ -17,6 +17,7 @@ import Parser from './parser/jsonParser';
 //import {IWorkspaceContextService} from 'vs/platform/workspace/common/workspace';
 //import {ISchemaContributions} from 'vs/platform/jsonschemas/common/jsonContributionRegistry';
 import {IDisposable, CompositeDisposable} from '../disposables';
+import request from 'request-light';
 
 export interface IJSONSchemaService {
 
@@ -33,7 +34,7 @@ export interface IJSONSchemaService {
     /**
      * Registers contributed schemas
      */
-    setSchemaContributions(schemaContributions:ISchemaContributions):void;
+    // setSchemaContributions(schemaContributions:ISchemaContributions):void;
 
     /**
      * Looks up the appropriate schema for the given URI
@@ -209,20 +210,17 @@ export class JSONSchemaService implements IJSONSchemaService {
     private filePatternAssociations: FilePatternAssociation[];
     private filePatternAssociationById: { [id:string]: FilePatternAssociation };
 
-    private requestService: IRequestService;
     private contextService : IWorkspaceContextService;
     private callOnDispose:CompositeDisposable;
 
-    constructor(@IRequestService requestService: IRequestService,
-        @IWorkspaceContextService contextService?: IWorkspaceContextService,
-        @IResourceService resourceService?: IResourceService) {
-        this.requestService = requestService;
+    constructor(
+        @IWorkspaceContextService contextService?: IWorkspaceContextService) {
         this.contextService = contextService;
         this.callOnDispose = new CompositeDisposable;
 
-        if (resourceService) {
-            this.callOnDispose.add(resourceService.addListener2_(ResourceEvents.CHANGED, (e: IResourceChangedEvent) => this.onResourceChange(e)));
-        }
+        // if (resourceService) {
+        //     this.callOnDispose.add(resourceService.addListener2_(ResourceEvents.CHANGED, (e: IResourceChangedEvent) => this.onResourceChange(e)));
+        // }
 
         this.contributionSchemas = {};
         this.contributionAssociations = {};
@@ -235,13 +233,13 @@ export class JSONSchemaService implements IJSONSchemaService {
         this.callOnDispose.dispose();
     }
 
-    private onResourceChange(e: IResourceChangedEvent): void {
-        var url = e.url.toString();
-        var schemaFile = this.schemasById[url];
-        if (schemaFile) {
-            schemaFile.clearSchema();
-        }
-    }
+    // private onResourceChange(e: IResourceChangedEvent): void {
+    //     var url = e.url.toString();
+    //     var schemaFile = this.schemasById[url];
+    //     if (schemaFile) {
+    //         schemaFile.clearSchema();
+    //     }
+    // }
 
     private normalizeId(id: string) {
         if (id.length > 0 && id.charAt(id.length - 1) === '#') {
@@ -250,15 +248,15 @@ export class JSONSchemaService implements IJSONSchemaService {
         return id;
     }
 
-    public setSchemaContributions(schemaContributions: ISchemaContributions): void {
-        if (schemaContributions.schemas) {
-            var schemas = schemaContributions.schemas;
-            for (let id in schemas) {
-                id = this.normalizeId(id);
-                this.contributionSchemas[id] = this.addSchemaHandle(id, schemas[id]);
-            }
-        }
-    }
+    // public setSchemaContributions(schemaContributions: ISchemaContributions): void {
+    //     if (schemaContributions.schemas) {
+    //         var schemas = schemaContributions.schemas;
+    //         for (let id in schemas) {
+    //             id = this.normalizeId(id);
+    //             this.contributionSchemas[id] = this.addSchemaHandle(id, schemas[id]);
+    //         }
+    //     }
+    // }
 
     private addSchemaHandle(id:string, unresolvedSchemaContent?: IJSONSchema) : SchemaHandle {
         var schemaHandle = new SchemaHandle(this, id, unresolvedSchemaContent);
@@ -319,7 +317,7 @@ export class JSONSchemaService implements IJSONSchemaService {
     }
 
     public loadSchema(url:string) : Promise<UnresolvedSchema> {
-        return this.requestService.makeRequest({ url: url }).then(
+        return request.xhr({ url: url }).then(
             request => {
                 var content = request.responseText;
                 if (!content) {

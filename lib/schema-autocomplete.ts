@@ -3,8 +3,13 @@ import {Subject, BehaviorSubject, Observable} from 'rxjs';
 import {CompositeDisposable} from './disposables';
 //var escape = require("escape-html");
 var filter = require('fuzzaldrin').filter;
-import {getPath, getRanges, ITokenRange} from "./helpers/get-ranges";
-import {schemaProvider, ISchemaInstance} from "./schema-provider";
+
+import {JSONSchemaService, ISchemaAssociations} from './vscode/plugin/jsonSchemaService';
+import {parse as parseJSON, ObjectASTNode, JSONDocument} from './vscode/plugin/jsonParser';
+import {JSONCompletion} from './vscode/plugin/jsonCompletion';
+
+const jsonSchemaService = new JSONSchemaService();
+const jsonCompletion = new JSONCompletion(jsonSchemaService, []);
 
 interface RequestOptions {
     editor: Atom.TextEditor;
@@ -59,180 +64,9 @@ function renderReturnType(returnType: string) {
     return `Returns: ${returnType}`;
 }
 
-function schemaGet(schema: ISchemaInstance, path: string) {
-    // ignore .data
-    var p = (path || '').split('/');
-    var rootSchema = schema;
-    while (p.length) {
-        let s = p.shift();
-        if (schema.properties && schema.properties[s]) {
-            schema = schema.properties[s]
-        } else if (schema.additionalProperties) {
-            schema = schema.additionalProperties;
-        }
-        if (schema.$ref) {
-            // This is the most common def case, may not always work
-            var childPath = _.trim(schema.$ref, '/#').split('/').join('.');
-            schema = _.get<ISchemaInstance>(rootSchema, childPath);
-        }
-    }
-    return schema;
-}
-
 function getSuggestions(options: RequestOptions): Promise<Suggestion[]> {
-    /*var buffer = options.editor.getBuffer();
-    var end = options.bufferPosition.column;
-    var data = buffer.getLines()[options.bufferPosition.row].substring(0, end + 1);
-    var lastCharacterTyped = data[end - 1];
-
-    if (!/[A-Z_0-9.]+/i.test(lastCharacterTyped)) {
-        return;
-    }*/
-    var line = options.editor.getBuffer().getLines()[options.bufferPosition.row];
-    var hasLeadingQuote = false;
-    for (var i = options.bufferPosition.column; i >= 0; i--) {
-        let char = line[i];
-        if (char === ',' || char === '}' || char === ':') {
-            break;
-        }
-
-        if (char === '"') {
-            hasLeadingQuote = true;
-            break;
-        }
-    }
-    var hasTrailingQuote = false;
-    for (var i = options.bufferPosition.column; i < line.length; i++) {
-        let char = line[i];
-        if (char === ':' || char === '}' || char === ',' || char === '{') {
-            break;
-        }
-
-        if (char === '"') {
-            hasTrailingQuote = true;
-            break;
-        }
-    }
-
-    var prefix = options.prefix;
-    try {
-        let cursor = options.editor.getLastCursor();
-        let editor = options.editor;
-        prefix = <any>editor.getTextInBufferRange(cursor.getCurrentWordBufferRange({ wordRegex: /^[\t ]*$|[^\s\/\\\(\)"':,\;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?]+|[\/\\\(\)"':,\;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?]+/ }));
-    } catch (e) { }
-
-    prefix = _.trim(prefix, ':{}," ');
-
-    var context = getPath(options.editor, (line, column) =>
-        options.bufferPosition.row === line && options.bufferPosition.column === column + 1);
-
-    var {ranges, objectPaths} = getRanges(options.editor);
-    var existingKeys = _(_.keys(ranges))
-        .filter(z => _.startsWith(z + '/', context.path))
-        .filter(z => z && z.indexOf('/') === -1)
-        .value();
-
-    var p = schemaProvider
-        .getSchemaForEditor(options.editor)
-        .flatMap(schema => schema.content)
-        .map(schema => {
-            // ignore .data
-            var p = (context.path || '').split('/');
-            var rootSchema = schema;
-
-            var parentSchema: any;
-            while (p.length) {
-                let lastSchema = schema;
-                let s = p.shift();
-                if (schema.properties && schema.properties[s]) {
-                    schema = schema.properties[s]
-                } else if (schema.additionalProperties) {
-                    schema = schema.additionalProperties;
-                } else if (schema !== rootSchema) {
-                    schema = <any>{};
-                }
-                if (schema.$ref) {
-                    // This is the most common def case, may not always work
-                    var childPath = _.trim(schema.$ref, '/#').split('/').join('.');
-                    schema = _.get<ISchemaInstance>(rootSchema, childPath);
-                }
-            }
-
-            var inferedType = "";
-            if (typeof schema.type === "string" && schema.type === "object") {
-                inferedType = "object";
-            }
-
-            var objectPath = _.find(objectPaths, (value, key) => key === context.path);
-            if (objectPath && _.isArray(schema.type) && _.includes(schema.type, "object") && (options.bufferPosition.row == objectPath.line && options.bufferPosition.column + 1 > objectPath.column || options.bufferPosition.row > objectPath.line)) {
-                inferedType = "object";
-            }
-
-            if (schema.enum && schema.enum.length) {
-                return schema.enum.map(property => ({ key: property, type: 'enum', description: '' }));
-            }
-
-            if (inferedType === "object" && schema.properties && _.some(schema.properties)) {
-                return _.keys(schema.properties)
-                    .filter(z => !_.includes(existingKeys, z))
-                    .map(property => {
-                        var propertySchema = schema.properties[property];
-                        return { key: property, type: typeof propertySchema.type === "string" ? <string>propertySchema.type : 'property', description: propertySchema.description }
-                    });
-            }
-
-            var types: string[] = [];
-            if (typeof schema.type === "string") {
-                types = <any>[schema.type];
-            } else if (_.isArray(types)) {
-                types = <any>schema.type || [];
-            }
-
-            if (types.length > 1) {
-                return _.map(types, type => {
-                    if (type === "string") {
-                        return { key: '""', type: "value", description: '' };
-                    } else if (type === "object") {
-                        var res = {};
-                        _.each(schema.properties, (value, key) => {
-                            if (value.type === "string")
-                                res[key] = value.default || '';
-                        });
-                        return { key: JSON.stringify(res, null, options.editor.getTabLength()), type: "value", description: '' };
-                    }
-                });
-            }
-
-            return [];
-        })
-        .defaultIfEmpty([])
-        .toPromise();
-
-    var search = prefix;
-    if (search === ".")
-        search = "";
-
-    //options.prefix = prefix;
-
-    if (search)
-        p = p.then(s =>
-            filter(s, search, { key: 'key' }));
-
-    var baseSuggestions = p.then(response => response.map(s => makeSuggestion(s, { replacementPrefix: prefix, hasLeadingQuote, hasTrailingQuote })));
-
-    if (providers.length) {
-        var workingOptions = <IAutocompleteProviderOptions>_.defaults({ prefix, replacementPrefix: prefix }, context, options);
-        var workingProviders = _.filter(providers, z =>
-            _.includes(z.fileMatchs, options.editor.getBuffer().getBaseName()) && z.pathMatch(context.path))
-            .map(z => z.getSuggestions(workingOptions).then(suggestions =>
-                _.each(suggestions, s => s.snippet = fixSnippet(s.snippet, { hasLeadingQuote, hasTrailingQuote }, 'other'))));
-        if (workingProviders.length) {
-            return Promise.all(workingProviders.concat([baseSuggestions]))
-                .then(items =>
-                    _.flatten(items));
-        }
-    }
-    return baseSuggestions;
+    return jsonCompletion.doSuggest(options.editor, options.bufferPosition, parseJSON(options.editor.getText()))
+        .then(x => x.items);
 }
 
 var providers: IAutocompleteProvider[] = [].concat(require('./providers/npm-provider')).concat(require('./providers/bower-provider'));
@@ -246,9 +80,12 @@ export var CompletionProvider = {
         providers.push(provider);
     },
     onDidInsertSuggestion({editor, suggestion}: { editor: Atom.TextEditor; triggerPosition: any; suggestion: { text: string } }) {
-        if (_.endsWith(suggestion.text, '.')) {
-            _.defer(() => atom.commands.dispatch(atom.views.getView(editor), "autocomplete-plus:activate"))
-        }
+        jsonCompletion.doResolve(<any>suggestion)
+            .then(() => {
+                if (_.endsWith(suggestion.text, '.')) {
+                    _.defer(() => atom.commands.dispatch(atom.views.getView(editor), "autocomplete-plus:activate"))
+                }
+            });
     },
     dispose() { }
 }

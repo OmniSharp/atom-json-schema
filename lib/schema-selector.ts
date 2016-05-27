@@ -18,7 +18,7 @@ class SchemaSelector {
         this.disposable = new CompositeDisposable();
     }
 
-    public setup(statusBar) {
+    public setup(statusBar: any) {
         this.statusBar = statusBar;
 
         if (this._active) {
@@ -58,14 +58,14 @@ class SchemaSelector {
         }));
 
         this.disposable.add(omni.activeEditor
-            .where(z => !z)
+            .filter(z => !z)
             .subscribe(() => this.view.style.display = 'none'));
         this.disposable.add(omni.activeEditor
-            .where(z => !!z)
+            .filter(z => !!z)
             .subscribe(() => this.view.style.display = ''));
 
         this.disposable.add(omni.activeEditor
-            .flatMapLatest(editor => schemaProvider.getSchemaForEditor(editor))
+            .switchMap(editor => schemaProvider.getSchemaForEditor(editor))
             .defaultIfEmpty(<any>{})
             .subscribe(activeSchema => {
                 omni.activeSchema = activeSchema;

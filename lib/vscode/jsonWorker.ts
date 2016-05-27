@@ -18,6 +18,7 @@ import PackageJSONContribution from './contributions/packageJSONContribution';
 import BowerJSONContribution from './contributions/bowerJSONContribution';
 import GlobPatternContribution from './contributions/globPatternContribution';
 import {JSONLocation} from './parser/jsonLocation';
+import request from 'request-light';
 
 export interface IOptionsSchema {
     /**
@@ -59,7 +60,6 @@ export interface IJSONWorkerContribution {
 export class JSONWorker {
 
     private schemaService: SchemaService.IJSONSchemaService;
-    private requestService: IRequestService;
     private contextService: IWorkspaceContextService;
     private jsonIntellisense : JSONIntellisense.JSONIntellisense;
     private contributions: IJSONWorkerContribution[];
@@ -72,7 +72,6 @@ export class JSONWorker {
         modeId: string,
         @IResourceService resourceService: IResourceService,
         @IMarkerService markerService: IMarkerService,
-        @IRequestService requestService: IRequestService,
         @IWorkspaceContextService contextService: IWorkspaceContextService,
         @IInstantiationService instantiationService: IInstantiationService
     ) {
@@ -87,7 +86,6 @@ export class JSONWorker {
             (toValidate) => this.doValidate(toValidate)
         );
 
-        this.requestService = requestService;
         this.contextService = contextService;
         this.schemaService = instantiationService.createInstance(SchemaService.JSONSchemaService);
 
@@ -98,7 +96,7 @@ export class JSONWorker {
             instantiationService.createInstance(GlobPatternContribution.GlobPatternContribution)
         ];
 
-        this.jsonIntellisense = new JSONIntellisense.JSONIntellisense(this.schemaService, this.contributions);
+        this.jsonIntellisense = new JSONIntellisense.JSONIntellisenese(this.schemaService, this.contributions);
     }
 
     public navigateValueSet(resource:URI, range:EditorCommon.IRange, up:boolean):Promise<IInplaceReplaceSupportResult> {

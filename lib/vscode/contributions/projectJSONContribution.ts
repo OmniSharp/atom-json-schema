@@ -9,15 +9,13 @@ import Strings from '../common/strings';
 import JSONWorker from '../jsonWorker';
 import {JSONLocation} from '../parser/jsonLocation';
 import URI from '../common/uri';
+import request from 'request-light';
 
 var LIMIT = 40;
 
 export class ProjectJSONContribution implements JSONWorker.IJSONWorkerContribution {
 
-    private requestService : IRequestService;
-
-    public constructor(@IRequestService requestService: IRequestService) {
-        this.requestService = requestService;
+    public constructor() {
     }
 
     private isProjectJSONFile(resource: URI): boolean {
@@ -58,7 +56,7 @@ export class ProjectJSONContribution implements JSONWorker.IJSONWorkerContributi
                     + '&$select=Id,Version,DownloadCount,Description&$format=json';
             }
 
-            return this.requestService.makeRequest({
+            return request.xhr({
                 url : queryUrl
             }).then((success) => {
                 if (success.status === 200) {
@@ -109,7 +107,7 @@ export class ProjectJSONContribution implements JSONWorker.IJSONWorkerContributi
                     + encodeURIComponent(currentKey)
                     + '\'&$select=Version,IsAbsoluteLatestVersion&$format=json&$top=' + LIMIT;
 
-            return this.requestService.makeRequest({
+            return request.xhr({
                 url : queryUrl
             }).then((success) => {
                 try {
@@ -158,7 +156,7 @@ export class ProjectJSONContribution implements JSONWorker.IJSONWorkerContributi
                 + '\'%20and%20IsAbsoluteLatestVersion%20eq%20true'
                 + '&$select=Version,Description&$format=json&$top=5';
 
-            return this.requestService.makeRequest({
+            return request.xhr({
                 url : queryUrl
             }).then((success) => {
                 var content = success.responseText;

@@ -20,18 +20,18 @@ interface GitHubTag {
     name: string;
 }
 
-function search(text) {
+function search(text: string) {
     var $get = fetch(`https://bower.herokuapp.com/packages/search/${text}`);
     return Observable
         .fromPromise<BowerResult[]>($get.then(res => res.json<BowerResult[]>()))
-        .flatMap<BowerResult>(Observable.fromArray);
+        .flatMap<BowerResult>(x => x);
 }
 
-function searchPackage(text, name: string) {
+function searchPackage(text: string, name: string) {
     var $get = fetch(`https://bower.herokuapp.com/packages/${name}`);
     var toJson = (res: IResult) => res.json<BowerResult>();
     var getReleases = (res: BowerResult) => {
-        if (!_.contains(res.url, 'github')) {
+        if (!_.includes(res.url, 'github')) {
             return;
         }
         var url = res.url.replace('.git', '/tags').replace('git://github.com/', 'https://api.github.com/repos/');
@@ -40,11 +40,11 @@ function searchPackage(text, name: string) {
     var getTags = (rel: GitHubTag) => rel.name.replace('v', '');
     return Observable
         .fromPromise<GitHubTag[]>($get.then(toJson).then(getReleases).then(res => res.json<GitHubTag[]>()))
-        .flatMap(Observable.fromArray)
+        .flatMap(x => x)
         .map(getTags);
 }
 
-function makeSuggestion(item: { name }) {
+function makeSuggestion(item: { name: string }) {
     var type = 'package';
 
     return {
@@ -59,7 +59,7 @@ function makeSuggestion(item: { name }) {
 var packageName: IAutocompleteProvider = {
     getSuggestions(options: IAutocompleteProviderOptions) {
         return search(options.replacementPrefix)
-            .filter(r=> _.contains(r.name, options.replacementPrefix))
+            .filter(r=> _.includes(r.name, options.replacementPrefix))
             .map(makeSuggestion)
             .toArray()
             .toPromise();
@@ -84,4 +84,4 @@ var packageVersion: IAutocompleteProvider = {
 }
 
 var providers = [packageName, packageVersion];
-export = providers;
+module.exports = providers;

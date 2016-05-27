@@ -1,20 +1,14 @@
-var validator: (schema) => validatorResult;
-(function(){
-    var loophole = require("loophole");
-    function allowUnsafe(fn) {
-        return loophole.allowUnsafeEval(function () { return loophole.allowUnsafeNewFunction(function () { return fn(); }); });
-    }
-
-    allowUnsafe(() => validator = require('is-my-json-valid'));
-})();
-
 var Range = require('atom').Range;
 import _ from 'lodash';
 import {omni} from "./omni";
 import {Observable} from "rxjs";
 import {CompositeDisposable} from "./disposables";
-import {schemaProvider} from "./schema-provider";
 import {getRanges, ITokenRange} from "./helpers/get-ranges";
+
+import {JSONSchemaService, ISchemaAssociations} from './vscode/plugin/jsonSchemaService';
+import {parse as parseJSON, ObjectASTNode, JSONDocument} from './vscode/plugin/jsonParser';
+
+const jsonSchemaService = new JSONSchemaService();
 
 interface LinterError {
     type: string; // 'error' | 'warning'
@@ -81,41 +75,52 @@ function mapValues(editor: Atom.TextEditor, ranges: { [key: string]: ITokenRange
     };
 }
 
-
-var makeValidator = _.memoize(schema => {
-    if (_.isEmpty(schema))
-        return null;
-    return validator(schema);
-});
-
 export var provider = [
     {
         grammarScopes: ['source.json'],
         scope: 'file',
         lintOnFly: true,
-        lint: (editor: Atom.TextEditor) =>
-            schemaProvider
-                .getSchemaForEditor(editor)
-                .flatMap(schema => schema.content)
-                .map(schema => makeValidator(schema))
-                .map(validate => {
-                    var {ranges} = getRanges(editor);
-                    try {
-                        var text = editor.getText().replace(/\n/g, '').replace(/\r/g, '').replace(/\t/g, '').trim();
-                        var data = JSON.parse(text);
-                    } catch (e) {
-                        // TODO: Should return a validation error that json is invalid?
-                        return [];
-                    }
+        lint: (editor: Atom.TextEditor) => {
+            if (editor.getText().length === 0) {
+                // ignore empty documents
+                return Promise.resolve<LinterError[]>([]);
+            }
 
-                    var result = validate(data, { greedy: true });
-                    if (validate.errors && validate.errors.length) {
-                        return validate.errors.map(error => mapValues(editor, ranges, error)).filter(z => !!z);
+            let jsonDocument = parseJSON(editor.getText());
+            return jsonSchemaService.getSchemaForResource(editor.getURI(), jsonDocument).then(schema => {
+                if (schema) {
+                    if (schema.errors.length && jsonDocument.root) {
+                        let astRoot = jsonDocument.root;
+                        let property = astRoot.type === 'object' ? (<ObjectASTNode>astRoot).getFirstProperty('$schema') : null;
+                        if (property) {
+                            let node = property.value || property;
+                            jsonDocument.warnings.push({ location: { start: node.start, end: node.end }, message: schema.errors[0] });
+                        } else {
+                            jsonDocument.warnings.push({ location: { start: astRoot.start, end: astRoot.start + 1 }, message: schema.errors[0] });
+                        }
+                    } else {
+                        jsonDocument.validate(schema.schema);
                     }
+                }
 
-                    return [];
-                })
-                .defaultIfEmpty([])
-                .toPromise()
+                let diagnostics: LinterError[] = [];
+                jsonDocument.errors.concat(jsonDocument.warnings).forEach((error, idx) => {
+                    // remove duplicated messages
+                    let signature = error.location.start + ' ' + error.location.end + ' ' + error.message;
+                    const location = editor.getBuffer().positionForCharacterIndex(error.location.start);
+
+                    diagnostics.push({
+                        type: idx >= jsonDocument.errors.length ? "warning" : "error",
+                        text: signature,
+                        filePath: editor.getPath(),
+                        line: location.row + 1,
+                        col: location.column + 1,
+                        range: new Range(error.location.start, error.location.end)
+                    });
+                });
+                // Send the computed diagnostics to VSCode.
+                return diagnostics;
+            });
+        }
     }
 ];

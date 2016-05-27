@@ -29,7 +29,7 @@ export function getErrorStatusDescription(status: number) : string {
         return void 0;
     }
     switch (status) {
-        case 400: return 'Bad request. The request cannot be fulfilled due to bad syntax.');
+        case 400: return 'Bad request. The request cannot be fulfilled due to bad syntax.';
         case 401: return 'Unauthorized. The server is refusing to respond.';
         case 403: return 'Forbidden. The server is refusing to respond.';
         case 404: return 'Not Found. The requested location could not be found.';
@@ -46,7 +46,7 @@ export function getErrorStatusDescription(status: number) : string {
         case 415: return 'Unsupported Media Type. The server will not accept the request, because the media type is not supported.';
         case 500: return 'Internal Server Error.';
         case 501: return 'Not Implemented. The server either does not recognize the request method, or it lacks the ability to fulfill the request.';
-        case 503: return 'Service Unavailable. The server is currently unavailable (overloaded or down.');
+        case 503: return 'Service Unavailable. The server is currently unavailable (overloaded or down.';
         default: return `HTTP status code ${status}`;
     }
 }

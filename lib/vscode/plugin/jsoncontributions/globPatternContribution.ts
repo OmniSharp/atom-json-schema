@@ -8,54 +8,51 @@ import Strings from '../utils/strings';
 import {IJSONWorkerContribution, ISuggestionsCollector} from '../jsonContributions';
 import {JSONLocation} from '../jsonLocation';
 
-import * as nls from 'vscode-nls';
-const localize = nls.loadMessageBundle();
-
-let globProperties: CompletionItem[] = [
-	{ kind: CompletionItemKind.Value, label: localize('fileLabel', "Files by Extension"), insertText: '"**/*.{{extension}}": true', documentation: localize('fileDescription', "Match all files of a specific file extension.") },
-	{ kind: CompletionItemKind.Value, label: localize('filesLabel', "Files with Multiple Extensions"), insertText: '"**/*.{ext1,ext2,ext3}": true', documentation: localize('filesDescription', "Match all files with any of the file extensions.") },
-	{ kind: CompletionItemKind.Value, label: localize('derivedLabel', "Files with Siblings by Name"), insertText: '"**/*.{{source-extension}}": { "when": "$(basename).{{target-extension}}" }', documentation: localize('derivedDescription', "Match files that have siblings with the same name but a different extension.") },
-	{ kind: CompletionItemKind.Value, label: localize('topFolderLabel', "Folder by Name (Top Level)"), insertText: '"{{name}}": true', documentation: localize('topFolderDescription', "Match a top level folder with a specific name.") },
-	{ kind: CompletionItemKind.Value, label: localize('topFoldersLabel', "Folders with Multiple Names (Top Level)"), insertText: '"{folder1,folder2,folder3}": true', documentation: localize('topFoldersDescription', "Match multiple top level folders.") },
-	{ kind: CompletionItemKind.Value, label: localize('folderLabel', "Folder by Name (Any Location)"), insertText: '"**/{{name}}": true', documentation: localize('folderDescription', "Match a folder with a specific name in any location.") },
+let globProperties: Suggestion[] = [
+    { type: "value", displayText: "Files by Extension", text: '"**/*.{{extension}}": true', description: `Match all files of a specific file extension.` },
+    { type: "value", displayText: "Files with Multiple Extensions", text: '"**/*.{ext1,ext2,ext3}": true', description: `Match all files with any of the file extensions.` },
+    { type: "value", displayText: "Files with Siblings by Name", text: '"**/*.{{source-extension}}": { "when": "$(basename).{{target-extension}}" }', description: `Match files that have siblings with the same name but a different extension.` },
+    { type: "value", displayText: "Folder by Name (Top Level)", text: '"{{name}}": true', description: `Match a top level folder with a specific name.` },
+    { type: "value", displayText: "Folders with Multiple Names (Top Level)", text: '"{folder1,folder2,folder3}": true', description: `Match multiple top level folders.` },
+    { type: "value", displayText: "Folder by Name (Any Location)", text: '"**/{{name}}": true', description: `Match a folder with a specific name in any location.` },
 ];
 
-let globValues: CompletionItem[] = [
-	{ kind: CompletionItemKind.Value, label: localize('trueLabel', "True"), insertText: 'true', documentation: localize('trueDescription', "Enable the pattern.") },
-	{ kind: CompletionItemKind.Value, label: localize('falseLabel', "False"), insertText: 'false', documentation: localize('falseDescription', "Disable the pattern.") },
-	{ kind: CompletionItemKind.Value, label: localize('derivedLabel', "Files with Siblings by Name"), insertText: '{ "when": "$(basename).{{extension}}" }', documentation: localize('siblingsDescription', "Match files that have siblings with the same name but a different extension.") }
+let globValues: Suggestion[] = [
+    { type: "value", displayText: "True", text: 'true', description: "Enable the pattern." },
+    { type: "value", displayText: "False", text: 'false', description: "Disable the pattern." },
+    { type: "value", displayText: "Files with Siblings by Name", text: '{ "when": "$(basename).{{extension}}" }', description: `Match files that have siblings with the same name but a different extension.` }
 ];
 
 export class GlobPatternContribution implements IJSONWorkerContribution {
 
-	constructor() {
-	}
+    constructor() {
+    }
 
-	private isSettingsFile(resource: string): boolean {
-		return Strings.endsWith(resource, '/settings.json');
-	}
+    private isSettingsFile(resource: string): boolean {
+        return Strings.endsWith(resource, '/settings.json');
+    }
 
-	public collectDefaultSuggestions(resource: string, result: ISuggestionsCollector): Promise<any> {
-		return null;
-	}
+    public collectDefaultSuggestions(resource: string, result: ISuggestionsCollector): Promise<any> {
+        return null;
+    }
 
-	public collectPropertySuggestions(resource: string, location: JSONLocation, currentWord: string, addValue: boolean, isLast: boolean, result: ISuggestionsCollector): Promise<any> {
-		if (this.isSettingsFile(resource) && (location.matches(['files.exclude']) || location.matches(['search.exclude']))) {
-			globProperties.forEach((e) => result.add(e));
-		}
+    public collectPropertySuggestions(resource: string, location: JSONLocation, currentWord: string, addValue: boolean, isLast: boolean, result: ISuggestionsCollector): Promise<any> {
+        if (this.isSettingsFile(resource) && (location.matches(['files.exclude']) || location.matches(['search.exclude']))) {
+            globProperties.forEach((e) => result.add(e));
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public collectValueSuggestions(resource: string, location: JSONLocation, currentKey: string, result: ISuggestionsCollector): Promise<any> {
-		if (this.isSettingsFile(resource) && (location.matches(['files.exclude']) || location.matches(['search.exclude']))) {
-			globValues.forEach((e) => result.add(e));
-		}
+    public collectValueSuggestions(resource: string, location: JSONLocation, currentKey: string, result: ISuggestionsCollector): Promise<any> {
+        if (this.isSettingsFile(resource) && (location.matches(['files.exclude']) || location.matches(['search.exclude']))) {
+            globValues.forEach((e) => result.add(e));
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public getInfoContribution(resource: string, location: JSONLocation): Promise<MarkedString[]> {
-		return null;
-	}
+    public getInfoContribution(resource: string, location: JSONLocation): Promise<MarkedString[]> {
+        return null;
+    }
 }

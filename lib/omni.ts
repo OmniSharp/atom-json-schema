@@ -26,14 +26,14 @@ class Omni implements IDisposable {
                 if (grammar) {
                     var grammarName = grammar.name;
                     if (grammarName === 'JSON') {
-                        this._editor.onNext(pane);
+                        this._editor.next(pane);
                         return;
                     }
                 }
             }
 
             // This will tell us when the editor is no longer an appropriate editor
-            this._editor.onNext(null);
+            this._editor.next(null);
         }));
     }
 
@@ -41,7 +41,7 @@ class Omni implements IDisposable {
     public get activeSchema() { return this._schema }
     public set activeSchema(value) {
         this._schema = value;
-        this._editorObservable.take(1).where(z => !!z).subscribe(editor => editor['__json__schema__'] = value);
+        this._editorObservable.take(1).filter(z => !!z).subscribe(editor => editor['__json__schema__'] = value);
     }
 }
 

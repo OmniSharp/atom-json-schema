@@ -35,7 +35,11 @@
   "exclude": [
     "node_modules",
     "typingsTemp",
-    "typings"
+    "typings",
+    "lib/vscode/plugin/server.ts",
+    "lib/vscode/plugin/jsonWorker.ts",
+    "lib/vscode/plugin/jsonSchemaService.ts",
+    "lib/vscode/plugin/jsonIntellisense.ts"
   ],
   "atom": {
     "rewriteTsconfig": true

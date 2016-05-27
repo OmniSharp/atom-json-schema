@@ -17,7 +17,7 @@ interface NpmPackage {
 }
 
 //https://skimdb.npmjs.com/registry/_design/app/_view/browseAll?group_level=1
-function search(text) {
+function search(text: string) {
     return Observable.fromPromise<NpmResult>(
         fetch(`https://skimdb.npmjs.com/registry/_design/app/_view/browseAll?group_level=1&limit=100&start_key=%5B%22${encodeURIComponent(text) }%22,%7B%7D%5D&end_key=%5B%22${encodeURIComponent(text) }z%22,%7B%7D%5D`)
             .then(res => res.json<NpmResult>())
@@ -27,7 +27,7 @@ function search(text) {
 }
 
 //http://registry.npmjs.org/gulp/latest
-function searchPackage(text, name: string) {
+function searchPackage(text: string, name: string) {
     return Observable.fromPromise<NpmPackage>(
         fetch(`http://registry.npmjs.org/${name}/latest`)
             .then(res => res.json<NpmPackage>())
@@ -85,4 +85,4 @@ var packageVersion: IAutocompleteProvider = {
 }
 
 var providers = [packageName, packageVersion];
-export = providers;
+module.exports = providers;
