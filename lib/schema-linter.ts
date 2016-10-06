@@ -1,12 +1,4 @@
-var validator: (schema) => validatorResult;
-(function(){
-    var loophole = require("loophole");
-    function allowUnsafe(fn) {
-        return loophole.allowUnsafeEval(function () { return loophole.allowUnsafeNewFunction(function () { return fn(); }); });
-    }
-
-    allowUnsafe(() => validator = require('is-my-json-valid'));
-})();
+var validator = require('is-my-json-valid');
 
 var Range = require('atom').Range;
 import _ = require('lodash');
@@ -82,9 +74,12 @@ function mapValues(editor: Atom.TextEditor, ranges: { [key: string]: ITokenRange
 
 
 var makeValidator = _.memoize(schema => {
+    var loophole = require("loophole");
     if (_.isEmpty(schema))
         return null;
-    return validator(schema);
+    return loophole.allowUnsafeNewFunction(function() {
+        return validator(schema);
+    });
 });
 
 export var provider = [
