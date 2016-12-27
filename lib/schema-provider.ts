@@ -1,5 +1,6 @@
 import * as _ from "lodash";
 var fetch: (url: string) => Rx.IPromise<IResult> = require('node-fetch');
+var stripBom = require("strip-bom");
 import {Observable} from "rx";
 
 interface IResult {
@@ -81,8 +82,11 @@ class SchemaProvider {
 
     private getSchemas() {
         //http://schemastore.org/api/json/catalog.json
-        return Observable.fromPromise<SchemaCatalog>(fetch('http://schemastore.org/api/json/catalog.json')
-            .then(res => res.json<SchemaCatalog>()))
+        return Observable.fromPromise<SchemaCatalog>(
+                fetch('http://schemastore.org/api/json/catalog.json')
+                    .then(res => res.text())
+                    .then(txt => JSON.parse(stripBom(txt)))
+            )
             .map(({ schemas }) => {
                 _.each(schemas, schema => {
                     this.addSchema(schema);
