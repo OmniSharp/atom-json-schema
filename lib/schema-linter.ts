@@ -89,6 +89,7 @@ var makeValidator = _.memoize(schema => {
 
 export var provider = [
     {
+        name: 'json-schema',
         grammarScopes: ['source.json'],
         scope: 'file',
         lintOnFly: true,
