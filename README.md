@@ -10,7 +10,7 @@ Adds support for [JSON Schema](http://json-schema.org/) in [Atom](http://atom.io
 ## Whats it do
 Using is-my-json-valid for schema validation, Json Schema warns the user if their json file doesn't match the commonly defined schema.  Also using the defined Json Schema we can offer auto completion results for enum values.
 
-## Extentions
+## Extensions
 Json Schema was built for use with [OmniSharp](http://www.omnisharp.net/).  There is an extension point that lets you plug in custom intellisense providers.  This is to help with tools like Npm or NuGet, where package.json and project.json
 both have their package references.  This this extension point you can plug in calls off to the associated webservice / localcache / whatever you want.
 
